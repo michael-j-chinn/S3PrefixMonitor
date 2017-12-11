@@ -51,7 +51,7 @@ let getFileNames = function(params) {
                 console.log(err);
                 resolve(response);
             } else if (data && data.Contents && data.Contents.length > 0) {
-                response.files = data.Contents.map(file => `${data.Name}/${file.Key}`);
+                response.files = data.Contents.map(file => `https://s3.console.aws.amazon.com/s3/object/${data.Name}/${file.Key}`);
                 return resolve(response);
             }
             else
