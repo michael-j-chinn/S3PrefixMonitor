@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            .axis--x path {
+                display: none;
+            }
+
+            .line {
+                fill: none;
+                stroke: steelblue;
+                stroke-width: 1.5px;
+            }
+
+        </style>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id="container" class="container-fluid">
+            <div id="15-sec-container" class="row" style="margin-bottom: 50px;">
+                <div class="col">
+                    <h1>15 Second Job - Auto Create Campaigns</h1>
+                    <div class="row">
+                        <div id="15-sec-broken-container" class="col">
+                            <h2>Broken Folder</h2>
+                            <svg id="chart-15-sec-broken" width="800" height="300"></svg>
+                        </div>
+                        <div id="15-sec-fixed-container" class="col">
+                            <h2>Fixed Folder</h2>
+                            <svg id="chart-15-sec-fixed" width="800" height="300"></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="15-min-container" class="row">
+                <div class="col">
+                    <h1>15 Minute Job - Download Keyword Cost</h1>
+                    <div class="row">
+                        <div id="15-min-broken-container" class="col">
+                            <h2>Broken Folder</h2>
+                            <svg id="chart-15-min-broken" width="800" height="300"></svg>  
+                        </div>
+                        <div id="15-min-fixed-container" class="col">
+                            <h2>Fixed Folder</h2>
+                            <svg id="chart-15-min-fixed" width="800" height="300"></svg>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <script src="//d3js.org/d3.v4.min.js"></script>
+        <script>
+            var charts = [
+                { svgId: 'chart-15-sec-broken', tsv: '15sec_broken_total'},
+                { svgId: 'chart-15-sec-fixed', tsv: '15sec_fixed_total'},
+                { svgId: 'chart-15-min-broken', tsv: '15min_broken_total'},
+                { svgId: 'chart-15-min-fixed', tsv: '15min_fixed_total'},
+            ];
+
+            function buildChart(config) {
+                $("#"+config.svgId).empty();
+
+                var svg = d3.select("#"+config.svgId),
+                    margin = {top: 20, right: 80, bottom: 30, left: 50},
+                    width = svg.attr("width") - margin.left - margin.right,
+                    height = svg.attr("height") - margin.top - margin.bottom,
+                    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                var parseTime = d3.timeParse("%Y%m%d%H%M");
+
+                var x = d3.scaleTime().range([0, width]),
+                    y = d3.scaleLinear().range([height, 0]),
+                    z = d3.scaleOrdinal(d3.schemeCategory10);
+
+                var line = d3.line()
+                    .curve(d3.curveBasis)
+                    .x(function(d) { return x(d.date); })
+                    .y(function(d) { return y(d.totalFiles); });
+
+                d3.tsv("/data/" + config.tsv + ".tsv", type, function(error, data) {
+                    if (error) throw error;
+
+                    var regions = data.columns.slice(1).map(function(id) {
+                        return {
+                            id: id,
+                            values: data.map(function(d) {
+                                return {date: d.date, totalFiles: d[id]};
+                            })
+                        };
+                    });
+
+                    x.domain(d3.extent(data, function(d) { return d.date; }));
+
+                    y.domain([
+                        d3.min(regions, function(c) { return d3.min(c.values, function(d) { return d.totalFiles; }); }),
+                        d3.max(regions, function(c) { return d3.max(c.values, function(d) { return d.totalFiles; }); })
+                    ]);
+
+                    z.domain(regions.map(function(c) { return c.id; }));
+
+                    g.append("g")
+                        .attr("class", "axis axis--x")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(x));
+
+                    g.append("g")
+                        .attr("class", "axis axis--y")
+                        .call(d3.axisLeft(y))
+                        .append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 6)
+                        .attr("dy", "0.71em")
+                        .attr("fill", "#000")
+                        .text("Total Files");
+
+                    var region = g.selectAll(".region")
+                        .data(regions)
+                        .enter().append("g")
+                        .attr("class", "region");
+
+                    region.append("path")
+                        .attr("class", "line")
+                        .attr("d", function(d) { return line(d.values); })
+                        .style("stroke", function(d) { return z(d.id); });
+
+                    region.append("text")
+                        .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
+                        .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.totalFiles) + ")"; })
+                        .attr("x", 3)
+                        .attr("dy", "0.35em")
+                        .style("font", "10px sans-serif")
+                        .text(function(d) { return d.id; });
+                });
+
+                function type(d, _, columns) {
+                    d.date = parseTime(d.date);
+                    for (var i = 1, n = columns.length, c; i < n; ++i) d[c = columns[i]] = +d[c];
+                    return d;
+                }
+            };
+
+            let buildCharts = () => {
+                charts.forEach(config => {
+                    buildChart(config);
+                });
+            };
+
+            var pullData = function() {
+                $.get('data/pull');
+            };
+
+            pullData();
+            buildCharts();
+
+            setInterval(buildCharts, 30000); // 30 Seconds
+            setInterval(pullData, 60000); // 1 min
+        </script>
+    </body>
+</html>
