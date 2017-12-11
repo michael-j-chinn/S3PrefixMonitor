@@ -4,6 +4,7 @@ const AWS = require('aws-sdk');
 const fs = require('fs');
 const moment = require('moment');
 const path = require('path');
+const mkdirp = require('mkdirp');
 
 // Setup express
 let app = express();
@@ -19,6 +20,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('public'));
 
 // Setup AWS
+AWS.config.loadFromPath('./configs/aws_config.json');
 var s3 = new AWS.S3();
 
 // Functions to get data from S3
@@ -49,7 +51,7 @@ let getFileNames = function(params) {
                 console.log(err);
                 resolve(response);
             } else if (data && data.Contents && data.Contents.length > 0) {
-                response.files = data.Contents.map(file => `${data.Name}/${data.Prefix}${file.Key}`);
+                response.files = data.Contents.map(file => `${data.Name}/${file.Key}`);
                 return resolve(response);
             }
             else
@@ -65,7 +67,7 @@ app.get('/', (req, res) => {
 app.get('/data/files', (req, res) => {
     console.log('/data/files');
 
-    fs.readFile('jobs.json', 'utf8', (err, data) => {
+    fs.readFile('./configs/jobs.json', 'utf8', (err, data) => {
         if (err) console.log(err);
 
         var config = JSON.parse(data);
@@ -96,7 +98,7 @@ app.get('/data/files', (req, res) => {
 app.get('/data/pull', (req, res) => {
     let date = moment().format('YYYYMMDDHHmm');
     
-    fs.readFile('jobs.json', 'utf8', (err, data) => {
+    fs.readFile('./configs/jobs.json', 'utf8', (err, data) => {
         if (err) console.log(err);
 
         var config = JSON.parse(data);
@@ -117,22 +119,26 @@ app.get('/data/pull', (req, res) => {
                 .then(apiResponses => {
                     // Write the row
                     let columns = [date].concat(apiResponses);
-                    let filePath = path.join('public', 'data', job.filename);
+                    let dir = path.join(__dirname, 'public', 'data');
+                    let filePath = path.join(dir, job.filename);
                     let dataTsv = columns.join('\t') + '\n';
 
-                    fs.exists(filePath, exists => {
-                        // If the file doesn't exist, write the column headers first.
-                        if (!exists) {
-                            let columnHeaders = ['date'].concat(job.regions);
+                    // Make sure the data directory exists
+                    mkdirp(dir, err => {
+                        // Make sure the file exists
+                        fs.exists(filePath, exists => {
+                            // If the file doesn't exist, write the column headers first.
+                            if (!exists) {
+                                let columnHeaders = ['date'].concat(job.regions);
+                                fs.writeFileSync(filePath, columnHeaders.join('\t') + '\n', 'utf8');
+                            }
 
-                            fs.writeFileSync(filePath, columnHeaders.join('\t') + '\n', 'utf8');
-                        }
-
-                        // Write the date to the file
-                        fs.appendFile(filePath, dataTsv, 'utf8', err => {
-                            if (err) console.log(err);
-            
-                            res.end();
+                            // Write the date to the file
+                            fs.appendFile(filePath, dataTsv, 'utf8', err => {
+                                if (err) console.log(err);
+                
+                                res.end();
+                            });
                         });
                     });
                 })

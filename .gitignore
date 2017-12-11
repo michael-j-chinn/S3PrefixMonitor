@@ -59,4 +59,4 @@ typings/
 
 # Data used to feed d3 charts
 data
-jobs.json
+configs
