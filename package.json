@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/michael-j-chinn/S3PrefixMonitor#readme",
   "dependencies": {
+    "aws-sdk": "^2.167.0",
     "body-parser": "^1.18.2",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "moment": "^2.19.4"
   }
 }
