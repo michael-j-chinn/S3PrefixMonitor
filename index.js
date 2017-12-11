@@ -65,8 +65,6 @@ app.get('/', (req, res) => {
 });
 
 app.get('/data/files', (req, res) => {
-    console.log('/data/files');
-
     fs.readFile('./configs/jobs.json', 'utf8', (err, data) => {
         if (err) console.log(err);
 
