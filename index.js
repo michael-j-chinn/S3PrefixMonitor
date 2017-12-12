@@ -147,6 +147,27 @@ app.get('/data/pull', (req, res) => {
     });
 });
 
+app.get('/data/processed/:bucket', (req, res) => {
+    var params = { Bucket: req.params.bucket, Prefix: 'click/integration-queue/v1/processed/'};
+    s3.listObjectsV2(params, function(err, data) {
+        let response = {
+            bucket: params.Bucket,
+            prefix: params.Prefix,
+            files: []
+        };
+
+        if (err) {
+            console.log(err);
+            res.json(response);
+        } else if (data && data.Contents && data.Contents.length > 0) {
+            response.files = data.Contents.map(file => `https://s3.console.aws.amazon.com/s3/object/${data.Name}/${file.Key}`);
+            return res.json(response);
+        }
+        else
+            return res.json(response);
+    });
+});
+
 // Setup routes
 app.listen(PORT, () => {
     console.log(`Listening on PORT: ${PORT}`);
