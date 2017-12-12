@@ -166,15 +166,15 @@
                 });
             };
 
-            var pullData = function() {
-                $.get('data/pull');
+            var pollData = function() {
+                $.get('data/poll');
             };
 
-            pullData();
+            pollData();
             buildCharts();
 
             setInterval(buildCharts, 30000); // 30 Seconds
-            setInterval(pullData, 60000); // 1 min
+            setInterval(pollData, 60000); // 1 min
         </script>
     </body>
 </html>

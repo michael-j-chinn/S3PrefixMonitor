@@ -93,7 +93,7 @@ app.get('/data/files', (req, res) => {
         });
 });
 
-app.get('/data/pull', (req, res) => {
+app.get('/data/poll', (req, res) => {
     let date = moment().format('YYYYMMDDHHmm');
     
     fs.readFile('./configs/jobs.json', 'utf8', (err, data) => {
