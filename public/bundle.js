@@ -23412,7 +23412,7 @@ var Navbar = function Navbar(props) {
             _react2.default.createElement(
                 'a',
                 { href: '#', className: 'brand-logo' },
-                'Logo'
+                'S3 Prefix Monitor'
             ),
             _react2.default.createElement(
                 'ul',
