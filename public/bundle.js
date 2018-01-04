@@ -23616,34 +23616,156 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _SettingsChart = __webpack_require__(80);
+
+var _SettingsChart2 = _interopRequireDefault(_SettingsChart);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SettingsRow = function (_Component) {
+    _inherits(SettingsRow, _Component);
+
+    function SettingsRow(props) {
+        _classCallCheck(this, SettingsRow);
+
+        var _this = _possibleConstructorReturn(this, (SettingsRow.__proto__ || Object.getPrototypeOf(SettingsRow)).call(this, props));
+
+        _this.state = { charts: [] };
+
+        _this.addChart = _this.addChart.bind(_this);
+        return _this;
+    }
+
+    _createClass(SettingsRow, [{
+        key: 'addChart',
+        value: function addChart(e) {
+            e.preventDefault();
+
+            var charts = this.state.charts;
+
+            charts.push({ key: charts.length + 1 });
+
+            this.setState({ charts: charts });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'row' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'col s12' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'input-field col s12' },
+                        _react2.default.createElement('input', { id: 'email', type: 'text', className: 'validate' }),
+                        _react2.default.createElement(
+                            'label',
+                            { htmlFor: 'email' },
+                            'Row Title'
+                        ),
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'waves-effect waves-light btn', onClick: this.addChart },
+                            'Add Chart'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'row' },
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'col s12' },
+                                this.state.charts.map(function (chart) {
+                                    return _react2.default.createElement(_SettingsChart2.default, { key: chart.key });
+                                })
+                            )
+                        )
+                    )
+                )
+            );
+        }
+    }]);
+
+    return SettingsRow;
+}(_react.Component);
+
+exports.default = SettingsRow;
+
+/***/ }),
+/* 80 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SettingsRow = function SettingsRow(props) {
+var SettingsChart = function SettingsChart(props) {
     return _react2.default.createElement(
         "div",
-        { className: "row" },
+        { className: "card blue-grey darken-1" },
         _react2.default.createElement(
             "div",
-            { className: "col s12" },
+            { className: "card-content white-text" },
+            _react2.default.createElement(
+                "span",
+                { className: "card-title" },
+                "Chart"
+            ),
             _react2.default.createElement(
                 "div",
-                { className: "input-field col s12" },
-                _react2.default.createElement("input", { id: "email", type: "text", className: "validate" }),
+                { className: "row" },
                 _react2.default.createElement(
-                    "label",
-                    { htmlFor: "email" },
-                    "Row Title"
+                    "div",
+                    { className: "input-field col s12" },
+                    _react2.default.createElement("input", { id: "email", type: "text", className: "validate" }),
+                    _react2.default.createElement(
+                        "label",
+                        { htmlFor: "email" },
+                        "Chart Title"
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                "div",
+                { className: "row" },
+                _react2.default.createElement(
+                    "div",
+                    { className: "input-field col s12" },
+                    _react2.default.createElement("input", { id: "email", type: "text", className: "validate" }),
+                    _react2.default.createElement(
+                        "label",
+                        { htmlFor: "email" },
+                        "Prefix to Monitor"
+                    )
                 )
             )
         )
     );
 };
 
-exports.default = SettingsRow;
+exports.default = SettingsChart;
 
 /***/ })
 /******/ ]);
