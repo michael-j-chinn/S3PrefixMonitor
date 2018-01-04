@@ -23411,12 +23411,43 @@ var Navbar = function Navbar(props) {
             { className: 'nav-wrapper' },
             _react2.default.createElement(
                 'a',
-                { href: '#', className: 'brand-logo' },
+                { href: '#!', className: 'brand-logo' },
                 'S3 Prefix Monitor'
+            ),
+            _react2.default.createElement(
+                'a',
+                { href: '#', 'data-activates': 'mobile-menu', className: 'button-collapse' },
+                _react2.default.createElement(
+                    'i',
+                    { className: 'material-icons' },
+                    'menu'
+                )
             ),
             _react2.default.createElement(
                 'ul',
                 { id: 'nav-mobile', className: 'right hide-on-med-and-down' },
+                _react2.default.createElement(
+                    'li',
+                    null,
+                    _react2.default.createElement(
+                        _reactRouterDom.Link,
+                        { to: '/charts' },
+                        'Charts'
+                    )
+                ),
+                _react2.default.createElement(
+                    'li',
+                    null,
+                    _react2.default.createElement(
+                        _reactRouterDom.Link,
+                        { to: '/settings' },
+                        'Settings'
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                'ul',
+                { className: 'side-nav', id: 'mobile-menu' },
                 _react2.default.createElement(
                     'li',
                     null,
@@ -23484,25 +23515,135 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _SettingsRow = __webpack_require__(79);
+
+var _SettingsRow2 = _interopRequireDefault(_SettingsRow);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SettingsContainer = function (_Component) {
+    _inherits(SettingsContainer, _Component);
+
+    function SettingsContainer(props) {
+        _classCallCheck(this, SettingsContainer);
+
+        var _this = _possibleConstructorReturn(this, (SettingsContainer.__proto__ || Object.getPrototypeOf(SettingsContainer)).call(this, props));
+
+        _this.state = {
+            rows: []
+        };
+
+        _this.addRow = _this.addRow.bind(_this);
+        return _this;
+    }
+
+    _createClass(SettingsContainer, [{
+        key: 'addRow',
+        value: function addRow(e) {
+            e.preventDefault();
+
+            var existingRows = this.state.rows;
+
+            existingRows.push({ key: existingRows.length + 1 });
+
+            this.setState({ rows: existingRows });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'container' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'row' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'col s12' },
+                        _react2.default.createElement(
+                            'h1',
+                            null,
+                            'Settings'
+                        ),
+                        _react2.default.createElement(
+                            'p',
+                            { className: 'flow-text' },
+                            'You can setup your charts here. Add rows with titles, then add one or more Charts to each row. All you need to specify for a Chart is the S3 prefix and buckets to track.'
+                        ),
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'btn-floating btn-large waves-effect waves-light red', onClick: this.addRow },
+                            _react2.default.createElement(
+                                'i',
+                                { className: 'material-icons' },
+                                'add'
+                            )
+                        )
+                    )
+                ),
+                this.state.rows.map(function (row) {
+                    return _react2.default.createElement(_SettingsRow2.default, { key: row.key });
+                })
+            );
+        }
+    }]);
+
+    return SettingsContainer;
+}(_react.Component);
+
+exports.default = SettingsContainer;
+
+/***/ }),
+/* 79 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SettingsContainer = function SettingsContainer(props) {
+var SettingsRow = function SettingsRow(props) {
     return _react2.default.createElement(
-        'div',
-        null,
+        "div",
+        { className: "row" },
         _react2.default.createElement(
-            'h1',
-            null,
-            'Settings'
+            "div",
+            { className: "col s12" },
+            _react2.default.createElement(
+                "div",
+                { className: "input-field col s12" },
+                _react2.default.createElement("input", { id: "email", type: "text", className: "validate" }),
+                _react2.default.createElement(
+                    "label",
+                    { htmlFor: "email" },
+                    "Row Title"
+                )
+            )
         )
     );
 };
 
-exports.default = SettingsContainer;
+exports.default = SettingsRow;
 
 /***/ })
 /******/ ]);

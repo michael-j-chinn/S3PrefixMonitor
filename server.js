@@ -60,8 +60,8 @@ app.use(express.static('public'));
 //     });
 // };
 
-app.get('/', (req, res) => {
-    res.json({ message: 'Visit index.html for charts or data/files for filenames.'});
+app.get('*', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
 });
 
 // app.get('/data/files', (req, res) => {
