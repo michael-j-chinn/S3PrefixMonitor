@@ -1,10 +1,10 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const AWS = require('aws-sdk');
-const fs = require('fs');
-const moment = require('moment');
-const path = require('path');
-const mkdirp = require('mkdirp');
+//const bodyParser = require('body-parser');
+//const AWS = require('aws-sdk');
+//const fs = require('fs');
+//const moment = require('moment');
+//const path = require('path');
+//const mkdirp = require('mkdirp');
 
 // Setup express
 let app = express();
@@ -13,8 +13,8 @@ let app = express();
 const PORT = process.env.PORT || 3000;
 
 // Setup body-parser
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({extended: false}));
 
 // Setup ability to serve static content
 app.use(express.static('public'));
