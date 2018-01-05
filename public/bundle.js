@@ -23546,6 +23546,7 @@ var SettingsContainer = function (_Component) {
         };
 
         _this.addRow = _this.addRow.bind(_this);
+        _this.save = _this.save.bind(_this);
         return _this;
     }
 
@@ -23560,6 +23561,9 @@ var SettingsContainer = function (_Component) {
 
             this.setState({ rows: existingRows });
         }
+    }, {
+        key: 'save',
+        value: function save() {}
     }, {
         key: 'render',
         value: function render() {
@@ -23584,17 +23588,71 @@ var SettingsContainer = function (_Component) {
                         ),
                         _react2.default.createElement(
                             'a',
-                            { className: 'btn-floating btn-large waves-effect waves-light red', onClick: this.addRow },
+                            { className: 'waves-effect waves-light btn', onClick: this.addRow },
                             _react2.default.createElement(
                                 'i',
-                                { className: 'material-icons' },
+                                { className: 'material-icons left' },
                                 'add'
+                            ),
+                            'Add Row'
+                        ),
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'waves-effect waves-light btn right', onClick: this.save },
+                            _react2.default.createElement(
+                                'i',
+                                { className: 'material-icons left' },
+                                'save'
+                            ),
+                            'Save'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'fixed-action-btn click-to-toggle' },
+                            _react2.default.createElement(
+                                'a',
+                                { className: 'btn-floating btn-large red' },
+                                _react2.default.createElement(
+                                    'i',
+                                    { className: 'large material-icons' },
+                                    'mode_edit'
+                                )
+                            ),
+                            _react2.default.createElement(
+                                'ul',
+                                null,
+                                _react2.default.createElement(
+                                    'li',
+                                    null,
+                                    _react2.default.createElement(
+                                        'a',
+                                        { className: 'btn-floating green', onClick: this.save },
+                                        _react2.default.createElement(
+                                            'i',
+                                            { className: 'material-icons' },
+                                            'save'
+                                        )
+                                    )
+                                ),
+                                _react2.default.createElement(
+                                    'li',
+                                    null,
+                                    _react2.default.createElement(
+                                        'a',
+                                        { className: 'btn-floating red', onClick: this.addRow },
+                                        _react2.default.createElement(
+                                            'i',
+                                            { className: 'material-icons' },
+                                            'add'
+                                        )
+                                    )
+                                )
                             )
                         )
                     )
                 ),
                 this.state.rows.map(function (row) {
-                    return _react2.default.createElement(_SettingsRow2.default, { key: row.key });
+                    return _react2.default.createElement(_SettingsRow2.default, { key: row.key, id: row.key });
                 })
             );
         }
@@ -23645,55 +23703,145 @@ var SettingsRow = function (_Component) {
         _this.state = { charts: [] };
 
         _this.addChart = _this.addChart.bind(_this);
+        _this.getRowId = _this.getRowId.bind(_this);
+        _this.getTabId = _this.getTabId.bind(_this);
+        _this.handleChartChange = _this.handleChartChange.bind(_this);
         return _this;
     }
 
     _createClass(SettingsRow, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            console.log('componentDidMount');
+        }
+    }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate() {
+            console.log('componentDidUpdate');
+            var length = this.state.charts.length;
+
+            if (length > 0) {
+                var row_id = this.getRowId();
+
+                $('#' + row_id + ' > div > ul.tabs').tabs();
+
+                // Always select the last tab
+                // let lastTabId = this.getTabId(this.state.charts[length-1].id);
+                // $('#' + row_id + ' > div > ul.tabs').tabs('select_tab', lastTabId);
+            }
+        }
+    }, {
+        key: 'getRowId',
+        value: function getRowId() {
+            return 'setting-row-' + this.props.id;
+        }
+    }, {
+        key: 'getTabId',
+        value: function getTabId(tabId) {
+            return this.getRowId() + '-tab-' + tabId;
+        }
+    }, {
         key: 'addChart',
         value: function addChart(e) {
             e.preventDefault();
 
+            console.log('addChart');
             var charts = this.state.charts;
 
-            charts.push({ key: charts.length + 1 });
+            var id = charts.length + 1;
+            var newChart = {
+                id: id,
+                title: 'Chart - #' + id,
+                prefix: '',
+                buckets: ''
+            };
+
+            charts.push(newChart);
+
+            this.setState({ charts: charts });
+        }
+    }, {
+        key: 'handleChartChange',
+        value: function handleChartChange(id, field, value) {
+            var charts = this.state.charts;
+
+            charts.forEach(function (chart) {
+                if (chart.id == id) {
+                    chart[field] = value;
+                }
+            });
 
             this.setState({ charts: charts });
         }
     }, {
         key: 'render',
         value: function render() {
+            var _this2 = this;
+
             return _react2.default.createElement(
                 'div',
-                { className: 'row' },
+                { id: "setting-row-" + this.props.id, className: 'card' },
                 _react2.default.createElement(
                     'div',
-                    { className: 'col s12' },
+                    { className: 'card-content' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'input-field col s12' },
-                        _react2.default.createElement('input', { id: 'email', type: 'text', className: 'validate' }),
-                        _react2.default.createElement(
-                            'label',
-                            { htmlFor: 'email' },
-                            'Row Title'
-                        ),
-                        _react2.default.createElement(
-                            'a',
-                            { className: 'waves-effect waves-light btn', onClick: this.addChart },
-                            'Add Chart'
-                        ),
+                        { className: 'row' },
                         _react2.default.createElement(
                             'div',
-                            { className: 'row' },
+                            { className: 'input-field col s12' },
+                            _react2.default.createElement('input', { id: 'email', type: 'text', className: 'validate' }),
                             _react2.default.createElement(
-                                'div',
-                                { className: 'col s12' },
-                                this.state.charts.map(function (chart) {
-                                    return _react2.default.createElement(_SettingsChart2.default, { key: chart.key });
-                                })
+                                'label',
+                                { htmlFor: 'email' },
+                                'Row Title'
+                            ),
+                            _react2.default.createElement(
+                                'a',
+                                { className: 'waves-effect waves-light btn', onClick: this.addChart },
+                                _react2.default.createElement(
+                                    'i',
+                                    { className: 'material-icons left' },
+                                    'add'
+                                ),
+                                'Add Chart'
                             )
                         )
                     )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'card-tabs' },
+                    _react2.default.createElement(
+                        'ul',
+                        { className: 'tabs' },
+                        this.state.charts.map(function (chart) {
+                            return _react2.default.createElement(
+                                'li',
+                                { className: 'tab', key: chart.id },
+                                _react2.default.createElement(
+                                    'a',
+                                    { href: '#' + _this2.getTabId(chart.id) },
+                                    chart.title
+                                )
+                            );
+                        })
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'card-content grey lighten-4' },
+                    this.state.charts.map(function (chart) {
+                        return _react2.default.createElement(_SettingsChart2.default, {
+                            key: chart.id,
+                            id: chart.id,
+                            containerId: _this2.getTabId(chart.id),
+                            title: chart.title,
+                            prefix: chart.prefix,
+                            buckets: chart.buckets,
+                            handleChartChange: _this2.handleChartChange
+                        });
+                    })
                 )
             );
         }
@@ -23715,55 +23863,96 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SettingsChart = function SettingsChart(props) {
-    return _react2.default.createElement(
-        "div",
-        { className: "card blue-grey darken-1" },
-        _react2.default.createElement(
-            "div",
-            { className: "card-content white-text" },
-            _react2.default.createElement(
-                "span",
-                { className: "card-title" },
-                "Chart"
-            ),
-            _react2.default.createElement(
-                "div",
-                { className: "row" },
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SettingsChart = function (_Component) {
+    _inherits(SettingsChart, _Component);
+
+    function SettingsChart(props) {
+        _classCallCheck(this, SettingsChart);
+
+        var _this = _possibleConstructorReturn(this, (SettingsChart.__proto__ || Object.getPrototypeOf(SettingsChart)).call(this, props));
+
+        _this.handleChange = _this.handleChange.bind(_this);
+        return _this;
+    }
+
+    _createClass(SettingsChart, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            Materialize.updateTextFields();
+        }
+    }, {
+        key: 'handleChange',
+        value: function handleChange(e) {
+            this.props.handleChartChange(this.props.id, e.target.name, e.target.value);
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { id: this.props.containerId },
                 _react2.default.createElement(
-                    "div",
-                    { className: "input-field col s12" },
-                    _react2.default.createElement("input", { id: "email", type: "text", className: "validate" }),
+                    'div',
+                    { className: 'row' },
                     _react2.default.createElement(
-                        "label",
-                        { htmlFor: "email" },
-                        "Chart Title"
+                        'div',
+                        { className: 'input-field col s12' },
+                        _react2.default.createElement('input', { id: this.props.containerId + 'chart-title', name: 'title', type: 'text', className: 'validate', onChange: this.handleChange, value: this.props.title }),
+                        _react2.default.createElement(
+                            'label',
+                            { htmlFor: this.props.containerId + 'chart-title' },
+                            'Chart Title'
+                        )
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'row' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'input-field col s12' },
+                        _react2.default.createElement('input', { id: this.props.containerId + 'chart-prefix', name: 'prefix', type: 'text', className: 'validate', onChange: this.handleChange, value: this.props.prefix }),
+                        _react2.default.createElement(
+                            'label',
+                            { htmlFor: this.props.containerId + 'chart-prefix' },
+                            'Prefix to Monitor'
+                        )
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'row' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'input-field col s12' },
+                        _react2.default.createElement('input', { id: this.props.containerId + 'chart-buckets', name: 'buckets', type: 'text', className: 'validate', onChange: this.handleChange, value: this.props.buckets }),
+                        _react2.default.createElement(
+                            'label',
+                            { htmlFor: this.props.containerId + 'chart-buckets' },
+                            'Buckets CSV'
+                        )
                     )
                 )
-            ),
-            _react2.default.createElement(
-                "div",
-                { className: "row" },
-                _react2.default.createElement(
-                    "div",
-                    { className: "input-field col s12" },
-                    _react2.default.createElement("input", { id: "email", type: "text", className: "validate" }),
-                    _react2.default.createElement(
-                        "label",
-                        { htmlFor: "email" },
-                        "Prefix to Monitor"
-                    )
-                )
-            )
-        )
-    );
-};
+            );
+        }
+    }]);
+
+    return SettingsChart;
+}(_react.Component);
 
 exports.default = SettingsChart;
 
