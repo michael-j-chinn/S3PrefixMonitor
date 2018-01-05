@@ -7,6 +7,10 @@ class SettingsChart extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
+    componentDidMount() {
+        setTimeout(() => Materialize.updateTextFields(), 1);
+    }
+
     handleChange(e) {
         e.preventDefault();
 

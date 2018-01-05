@@ -23932,6 +23932,13 @@ var SettingsChart = function (_Component) {
     }
 
     _createClass(SettingsChart, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            setTimeout(function () {
+                return Materialize.updateTextFields();
+            }, 1);
+        }
+    }, {
         key: 'handleChange',
         value: function handleChange(e) {
             e.preventDefault();
