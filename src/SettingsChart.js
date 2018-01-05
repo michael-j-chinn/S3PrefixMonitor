@@ -6,12 +6,11 @@ class SettingsChart extends Component {
 
         this.handleChange = this.handleChange.bind(this);
     }
-    componentDidMount() {
-        Materialize.updateTextFields();
-    }
 
     handleChange(e) {
-        this.props.handleChartChange(this.props.id, e.target.name, e.target.value);
+        e.preventDefault();
+
+        this.props.handleChartChange(this.props.rowId, this.props.id, e.target.name, e.target.value);
     }
 
     render() {

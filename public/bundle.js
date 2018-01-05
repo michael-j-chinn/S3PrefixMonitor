@@ -23546,27 +23546,109 @@ var SettingsContainer = function (_Component) {
         };
 
         _this.addRow = _this.addRow.bind(_this);
+        _this.addChart = _this.addChart.bind(_this);
         _this.save = _this.save.bind(_this);
+        _this.handleRowChange = _this.handleRowChange.bind(_this);
+        _this.handleChartChange = _this.handleChartChange.bind(_this);
         return _this;
     }
 
     _createClass(SettingsContainer, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this2 = this;
+
+            axios.get('/api/settings').then(function (response) {
+                _this2.setState(response.data);
+            });
+        }
+    }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate() {
+            $('ul.tabs').tabs();
+        }
+    }, {
         key: 'addRow',
         value: function addRow(e) {
             e.preventDefault();
 
             var existingRows = this.state.rows;
 
-            existingRows.push({ key: existingRows.length + 1 });
+            var newRow = {
+                id: existingRows.length + 1,
+                title: '',
+                charts: []
+            };
+
+            existingRows.push(newRow);
 
             this.setState({ rows: existingRows });
         }
     }, {
+        key: 'addChart',
+        value: function addChart(e, rowId) {
+            e.preventDefault();
+
+            var rows = this.state.rows;
+
+            rows.forEach(function (row) {
+                if (row.id == rowId) {
+                    var id = row.charts.length + 1;
+                    var newChart = {
+                        id: id,
+                        title: 'Chart - #' + id,
+                        prefix: '',
+                        buckets: ''
+                    };
+
+                    row.charts.push(newChart);
+                }
+            });
+
+            this.setState({ rows: rows });
+        }
+    }, {
+        key: 'handleRowChange',
+        value: function handleRowChange(id, field, value) {
+            var rows = this.state.rows;
+
+            rows.forEach(function (row) {
+                if (row.id == rowId) {
+                    row[field] = value;
+                }
+            });
+
+            this.setState({ rows: rows });
+        }
+    }, {
+        key: 'handleChartChange',
+        value: function handleChartChange(rowId, chartId, field, value) {
+            var rows = this.state.rows;
+
+            rows.forEach(function (row) {
+                if (row.id == rowId) {
+                    var charts = row.charts;
+
+                    charts.forEach(function (chart) {
+                        if (chart.id == chartId) {
+                            chart[field] = value;
+                        }
+                    });
+                }
+            });
+
+            this.setState({ rows: rows });
+        }
+    }, {
         key: 'save',
-        value: function save() {}
+        value: function save() {
+            axios.post('/api/settings', this.state);
+        }
     }, {
         key: 'render',
         value: function render() {
+            var _this3 = this;
+
             return _react2.default.createElement(
                 'div',
                 { className: 'container' },
@@ -23652,7 +23734,14 @@ var SettingsContainer = function (_Component) {
                     )
                 ),
                 this.state.rows.map(function (row) {
-                    return _react2.default.createElement(_SettingsRow2.default, { key: row.key, id: row.key });
+                    return _react2.default.createElement(_SettingsRow2.default, {
+                        key: row.id,
+                        id: row.id,
+                        title: row.title,
+                        charts: row.charts,
+                        addChart: _this3.addChart,
+                        handleChartChange: _this3.handleChartChange
+                    });
                 })
             );
         }
@@ -23700,37 +23789,13 @@ var SettingsRow = function (_Component) {
 
         var _this = _possibleConstructorReturn(this, (SettingsRow.__proto__ || Object.getPrototypeOf(SettingsRow)).call(this, props));
 
-        _this.state = { charts: [] };
-
-        _this.addChart = _this.addChart.bind(_this);
         _this.getRowId = _this.getRowId.bind(_this);
         _this.getTabId = _this.getTabId.bind(_this);
-        _this.handleChartChange = _this.handleChartChange.bind(_this);
+        _this.handleChange = _this.handleChange.bind(_this);
         return _this;
     }
 
     _createClass(SettingsRow, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            console.log('componentDidMount');
-        }
-    }, {
-        key: 'componentDidUpdate',
-        value: function componentDidUpdate() {
-            console.log('componentDidUpdate');
-            var length = this.state.charts.length;
-
-            if (length > 0) {
-                var row_id = this.getRowId();
-
-                $('#' + row_id + ' > div > ul.tabs').tabs();
-
-                // Always select the last tab
-                // let lastTabId = this.getTabId(this.state.charts[length-1].id);
-                // $('#' + row_id + ' > div > ul.tabs').tabs('select_tab', lastTabId);
-            }
-        }
-    }, {
         key: 'getRowId',
         value: function getRowId() {
             return 'setting-row-' + this.props.id;
@@ -23741,37 +23806,11 @@ var SettingsRow = function (_Component) {
             return this.getRowId() + '-tab-' + tabId;
         }
     }, {
-        key: 'addChart',
-        value: function addChart(e) {
+        key: 'handleChange',
+        value: function handleChange(e) {
             e.preventDefault();
 
-            console.log('addChart');
-            var charts = this.state.charts;
-
-            var id = charts.length + 1;
-            var newChart = {
-                id: id,
-                title: 'Chart - #' + id,
-                prefix: '',
-                buckets: ''
-            };
-
-            charts.push(newChart);
-
-            this.setState({ charts: charts });
-        }
-    }, {
-        key: 'handleChartChange',
-        value: function handleChartChange(id, field, value) {
-            var charts = this.state.charts;
-
-            charts.forEach(function (chart) {
-                if (chart.id == id) {
-                    chart[field] = value;
-                }
-            });
-
-            this.setState({ charts: charts });
+            this.props.handleRowChange(this.props.id, e.target.name, e.target.value);
         }
     }, {
         key: 'render',
@@ -23780,7 +23819,7 @@ var SettingsRow = function (_Component) {
 
             return _react2.default.createElement(
                 'div',
-                { id: "setting-row-" + this.props.id, className: 'card' },
+                { id: this.getRowId(), className: 'card' },
                 _react2.default.createElement(
                     'div',
                     { className: 'card-content' },
@@ -23790,7 +23829,7 @@ var SettingsRow = function (_Component) {
                         _react2.default.createElement(
                             'div',
                             { className: 'input-field col s12' },
-                            _react2.default.createElement('input', { id: 'email', type: 'text', className: 'validate' }),
+                            _react2.default.createElement('input', { id: this.getRowId() + '-title', type: 'text', className: 'validate', onChange: this.handleChange, value: this.props.title }),
                             _react2.default.createElement(
                                 'label',
                                 { htmlFor: 'email' },
@@ -23798,7 +23837,9 @@ var SettingsRow = function (_Component) {
                             ),
                             _react2.default.createElement(
                                 'a',
-                                { className: 'waves-effect waves-light btn', onClick: this.addChart },
+                                { className: 'waves-effect waves-light btn', onClick: function onClick(e) {
+                                        return _this2.props.addChart(e, _this2.props.id);
+                                    } },
                                 _react2.default.createElement(
                                     'i',
                                     { className: 'material-icons left' },
@@ -23815,7 +23856,7 @@ var SettingsRow = function (_Component) {
                     _react2.default.createElement(
                         'ul',
                         { className: 'tabs' },
-                        this.state.charts.map(function (chart) {
+                        this.props.charts.map(function (chart) {
                             return _react2.default.createElement(
                                 'li',
                                 { className: 'tab', key: chart.id },
@@ -23831,15 +23872,16 @@ var SettingsRow = function (_Component) {
                 _react2.default.createElement(
                     'div',
                     { className: 'card-content grey lighten-4' },
-                    this.state.charts.map(function (chart) {
+                    this.props.charts.map(function (chart) {
                         return _react2.default.createElement(_SettingsChart2.default, {
                             key: chart.id,
                             id: chart.id,
+                            rowId: _this2.props.id,
                             containerId: _this2.getTabId(chart.id),
                             title: chart.title,
                             prefix: chart.prefix,
                             buckets: chart.buckets,
-                            handleChartChange: _this2.handleChartChange
+                            handleChartChange: _this2.props.handleChartChange
                         });
                     })
                 )
@@ -23890,14 +23932,11 @@ var SettingsChart = function (_Component) {
     }
 
     _createClass(SettingsChart, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            Materialize.updateTextFields();
-        }
-    }, {
         key: 'handleChange',
         value: function handleChange(e) {
-            this.props.handleChartChange(this.props.id, e.target.name, e.target.value);
+            e.preventDefault();
+
+            this.props.handleChartChange(this.props.rowId, this.props.id, e.target.name, e.target.value);
         }
     }, {
         key: 'render',

@@ -60,6 +60,22 @@ app.use(express.static('public'));
 //     });
 // };
 
+app.get('/api/settings', (req, res) => {
+    res.json({
+        rows: [{
+                id: 1,
+                title: 'Fake Row',
+                charts: [{
+                    id: 1,
+                    title: 'Fake Chart',
+                    prefix: 'blah/foo/bar',
+                    buckets: 'big-bucket-us1'
+                }]
+            }
+        ]
+    });
+});
+
 app.get('*', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });

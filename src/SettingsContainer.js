@@ -10,7 +10,21 @@ class SettingsContainer extends Component {
         };
 
         this.addRow = this.addRow.bind(this);
+        this.addChart = this.addChart.bind(this);
         this.save = this.save.bind(this);
+        this.handleRowChange = this.handleRowChange.bind(this);
+        this.handleChartChange = this.handleChartChange.bind(this);
+    }
+
+    componentDidMount() {
+        axios.get('/api/settings')
+            .then(response => {
+                this.setState(response.data);
+            });
+    }
+
+    componentDidUpdate() {
+        $('ul.tabs').tabs();
     }
 
     addRow(e) {
@@ -18,13 +32,71 @@ class SettingsContainer extends Component {
 
         var existingRows = this.state.rows;
 
-        existingRows.push({ key: existingRows.length + 1 });
+        var newRow = {
+            id: existingRows.length + 1,
+            title: '',
+            charts: []
+        };
+
+        existingRows.push(newRow);
 
         this.setState({rows: existingRows});
     }
 
-    save() {
+    addChart(e, rowId){
+        e.preventDefault();
 
+        let rows = this.state.rows;
+
+        rows.forEach(row => {
+            if (row.id == rowId) {
+                let id = row.charts.length + 1;
+                let newChart = {
+                    id,
+                    title: 'Chart - #' + id,
+                    prefix: '',
+                    buckets: ''
+                };
+
+                row.charts.push(newChart);
+            }
+        });
+
+        this.setState({rows});
+    }
+
+    handleRowChange(id, field, value) {
+        let rows = this.state.rows;
+
+        rows.forEach(row => {
+            if (row.id == rowId) {
+                row[field] = value;
+            }
+        });
+
+        this.setState({rows});
+    }
+
+    handleChartChange(rowId, chartId, field, value) {
+        let rows = this.state.rows;
+
+        rows.forEach(row => {
+            if (row.id == rowId) {
+                let charts = row.charts;
+
+                charts.forEach(chart => {
+                    if (chart.id == chartId) {
+                        chart[field] = value;
+                    }
+                });
+            }
+        });
+
+        this.setState({rows});
+    }
+
+    save() {
+        axios.post('/api/settings', this.state);
     }
 
     render() {
@@ -47,7 +119,16 @@ class SettingsContainer extends Component {
                         </div>
                     </div>
                 </div>
-                {this.state.rows.map(row => <SettingsRow key={row.key} id={row.key} /> )}
+                {this.state.rows.map(row => 
+                    <SettingsRow 
+                        key={row.id}
+                        id={row.id}
+                        title={row.title}
+                        charts={row.charts}
+                        addChart={this.addChart}
+                        handleChartChange={this.handleChartChange}
+                    /> 
+                )}
             </div>
         );
     }
