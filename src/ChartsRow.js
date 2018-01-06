@@ -11,15 +11,18 @@ class ChartsRow extends Component {
             <div className='row'>
                 <div className='col s12'>
                     <h3>{this.props.title}</h3>
-                    {this.props.charts.map(chart =>
-                        <Chart 
-                            key={chart.id}
-                            id={chart.id}
-                            title={chart.title}
-                            width={800}
-                            height={300}
-                        />
-                    )}
+                    <div className="row">
+                        {this.props.charts.map(chart =>
+                            <Chart 
+                                key={chart.id}
+                                id={chart.id}
+                                title={chart.title}
+                                colSize={this.props.colSize}
+                                width={800}
+                                height={300}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
         );

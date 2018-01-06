@@ -1,19 +1,36 @@
 import React, { Component } from 'react';
-import ChartsRow from './ChartsRow'
+import ChartsRow from './ChartsRow';
+
+
 
 class ChartContainer extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            rows: []
+            intervalId: '',
+            settings: { rows:[] }
         };
+
+        this.getChartSettings = this.getChartSettings.bind(this);
     }
 
     componentDidMount() {
-        axios.get('/api/settings')
+        getChartSettings();
+        
+        let intervalId = setInterval(() => getChartSettings(), 15000);
+
+        this.setState({intervalId});
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.state.intervalId);
+    }
+
+    getChartSettings() {
+        axios.get('/api/charts')
             .then(response => {
-                this.setState(response.data);
+                this.setState({ settings: response.data });
             });
     }
 
@@ -23,12 +40,13 @@ class ChartContainer extends Component {
                 <div className='row'>
                     <div className='col s12'>
                         <h1>Charts</h1>
-                        {this.state.rows.map(row => 
+                        {this.state.settings.rows.map(row => 
                             <ChartsRow 
                                 key={row.id}
                                 id={row.id}
                                 title={row.title}
                                 charts={row.charts}
+                                colSize={row.colSize}
                             /> 
                         )}
                     </div>

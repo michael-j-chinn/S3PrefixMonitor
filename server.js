@@ -71,6 +71,28 @@ app.get('/api/settings', (req, res) => {
     });
 });
 
+app.get('/api/charts', (req, res) => {
+    let filepath = path.join(__dirname, 'config', 'settings.json');
+
+    fs.readFile(filepath, 'utf8', (err, data) => {
+        if (err)
+            res.json('{}');
+        else
+        {
+            var settings = JSON.parse(data);
+
+            settings.rows.forEach(row => {
+                if (row.charts.length <= 12)
+                    row.colSize = 12 / row.charts.length;
+                else
+                    row.colSize = 1;
+            });
+
+            res.json(settings);
+        }
+    });
+});
+
 app.post('/api/settings', (req, res) => {
     let dir = path.join(__dirname, 'config');
 
