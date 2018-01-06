@@ -7,7 +7,10 @@ class Chart extends Component {
 
     render() {
         return (
-            <svg width={props.width} height={props.height}></svg>
+            <div>
+                <h5>{this.props.title}</h5>
+                <img width={this.props.width} height={this.props.height} src="http://via.placeholder.com/800x300" />
+            </div>
         );
     }
 }

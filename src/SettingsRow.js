@@ -9,7 +9,7 @@ class SettingsRow extends Component {
         this.getTabId = this.getTabId.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
-    
+
     getRowId() {
         return 'setting-row-' + this.props.id;
     }
@@ -30,9 +30,10 @@ class SettingsRow extends Component {
                 <div className="card-content">
                     <div className="row">
                         <div className="input-field col s12">
-                            <input id={this.getRowId() + '-title'} type="text" className="validate" onChange={this.handleChange} value={this.props.title } />
-                            <label htmlFor="email">Row Title</label>
-                            <a className="waves-effect waves-light btn" onClick={(e) => this.props.addChart(e, this.props.id)}><i className="material-icons left">add</i>Add Chart</a>
+                            <input id={this.getRowId() + '-title'} name='title' type="text" onChange={this.handleChange} value={this.props.title } />
+                            <label className="active" htmlFor={this.getRowId() + '-title'}>Row Title</label>
+                            <a className="waves-effect waves-light btn" style={{marginRight: '15px'}} onClick={(e) => this.props.addChart(e, this.props.id)}><i className="material-icons left">add</i>Add Chart</a>
+                            <a className="waves-effect waves-light btn red" onClick={(e) => this.props.deleteRow(e, this.props.id)}><i className="material-icons left">delete_sweep</i>Delete Row</a>
                         </div>
                     </div>
                 </div>
@@ -43,16 +44,17 @@ class SettingsRow extends Component {
                 </div>
                 <div className="card-content grey lighten-4">
                     {this.props.charts.map(chart =>
-                            <SettingsChart 
-                                key={chart.id}
-                                id={chart.id}
-                                rowId={this.props.id}
-                                containerId={this.getTabId(chart.id)}
-                                title={chart.title}
-                                prefix={chart.prefix}
-                                buckets={chart.buckets}
-                                handleChartChange={this.props.handleChartChange}
-                            />
+                        <SettingsChart 
+                            key={chart.id}
+                            id={chart.id}
+                            rowId={this.props.id}
+                            containerId={this.getTabId(chart.id)}
+                            title={chart.title}
+                            prefix={chart.prefix}
+                            buckets={chart.buckets}
+                            handleChartChange={this.props.handleChartChange}
+                            deleteChart={this.props.deleteChart}
+                        />
                     )}
                 </div>
             </div>

@@ -19710,7 +19710,7 @@ var _ChartsContainer = __webpack_require__(77);
 
 var _ChartsContainer2 = _interopRequireDefault(_ChartsContainer);
 
-var _SettingsContainer = __webpack_require__(78);
+var _SettingsContainer = __webpack_require__(80);
 
 var _SettingsContainer2 = _interopRequireDefault(_SettingsContainer);
 
@@ -23484,23 +23484,82 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _ChartsRow = __webpack_require__(78);
+
+var _ChartsRow2 = _interopRequireDefault(_ChartsRow);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ChartContainer = function ChartContainer(props) {
-    return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement(
-            'h1',
-            null,
-            'Charts'
-        )
-    );
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ChartContainer = function (_Component) {
+    _inherits(ChartContainer, _Component);
+
+    function ChartContainer(props) {
+        _classCallCheck(this, ChartContainer);
+
+        var _this = _possibleConstructorReturn(this, (ChartContainer.__proto__ || Object.getPrototypeOf(ChartContainer)).call(this, props));
+
+        _this.state = {
+            rows: []
+        };
+        return _this;
+    }
+
+    _createClass(ChartContainer, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this2 = this;
+
+            axios.get('/api/settings').then(function (response) {
+                _this2.setState(response.data);
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'container' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'row' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'col s12' },
+                        _react2.default.createElement(
+                            'h1',
+                            null,
+                            'Charts'
+                        ),
+                        this.state.rows.map(function (row) {
+                            return _react2.default.createElement(_ChartsRow2.default, {
+                                key: row.id,
+                                id: row.id,
+                                title: row.title,
+                                charts: row.charts
+                            });
+                        })
+                    )
+                )
+            );
+        }
+    }]);
+
+    return ChartContainer;
+}(_react.Component);
+
+;
 
 exports.default = ChartContainer;
 
@@ -23521,7 +23580,133 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _SettingsRow = __webpack_require__(79);
+var _Chart = __webpack_require__(79);
+
+var _Chart2 = _interopRequireDefault(_Chart);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ChartsRow = function (_Component) {
+    _inherits(ChartsRow, _Component);
+
+    function ChartsRow(props) {
+        _classCallCheck(this, ChartsRow);
+
+        return _possibleConstructorReturn(this, (ChartsRow.__proto__ || Object.getPrototypeOf(ChartsRow)).call(this, props));
+    }
+
+    _createClass(ChartsRow, [{
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'row' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'col s12' },
+                    _react2.default.createElement(
+                        'h3',
+                        null,
+                        this.props.title
+                    ),
+                    this.props.charts.map(function (chart) {
+                        return _react2.default.createElement(_Chart2.default, {
+                            key: chart.id,
+                            id: chart.id,
+                            title: chart.title,
+                            width: 800,
+                            height: 300
+                        });
+                    })
+                )
+            );
+        }
+    }]);
+
+    return ChartsRow;
+}(_react.Component);
+
+exports.default = ChartsRow;
+
+/***/ }),
+/* 79 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Chart = function (_Component) {
+    _inherits(Chart, _Component);
+
+    function Chart(props) {
+        _classCallCheck(this, Chart);
+
+        return _possibleConstructorReturn(this, (Chart.__proto__ || Object.getPrototypeOf(Chart)).call(this, props));
+    }
+
+    _createClass(Chart, [{
+        key: "render",
+        value: function render() {
+            return _react2.default.createElement(
+                "div",
+                null,
+                _react2.default.createElement(
+                    "h5",
+                    null,
+                    this.props.title
+                ),
+                _react2.default.createElement("img", { width: this.props.width, height: this.props.height, src: "http://via.placeholder.com/800x300" })
+            );
+        }
+    }]);
+
+    return Chart;
+}(_react.Component);
+
+exports.default = Chart;
+
+/***/ }),
+/* 80 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _SettingsRow = __webpack_require__(81);
 
 var _SettingsRow2 = _interopRequireDefault(_SettingsRow);
 
@@ -23550,6 +23735,8 @@ var SettingsContainer = function (_Component) {
         _this.save = _this.save.bind(_this);
         _this.handleRowChange = _this.handleRowChange.bind(_this);
         _this.handleChartChange = _this.handleChartChange.bind(_this);
+        _this.deleteRow = _this.deleteRow.bind(_this);
+        _this.deleteChart = _this.deleteChart.bind(_this);
         return _this;
     }
 
@@ -23585,6 +23772,51 @@ var SettingsContainer = function (_Component) {
             this.setState({ rows: existingRows });
         }
     }, {
+        key: 'deleteRow',
+        value: function deleteRow(e, id) {
+            e.preventDefault();
+
+            var existingRows = this.state.rows;
+
+            var indexToDelete = -1;
+            for (var i = 0; i < existingRows.length; i++) {
+                if (existingRows[i].id == id) {
+                    indexToDelete = i;
+                    break;
+                }
+            }
+
+            existingRows.splice(indexToDelete, 1);
+
+            this.setState({ existingRows: existingRows });
+        }
+    }, {
+        key: 'deleteChart',
+        value: function deleteChart(e, rowId, chartId) {
+            e.preventDefault();
+
+            var existingRows = this.state.rows;
+
+            existingRows.forEach(function (row) {
+                if (row.id == rowId) {
+                    var existingCharts = row.charts;
+                    var indexToDelete = -1;
+
+                    for (var i = 0; i < existingCharts.length; i++) {
+                        if (existingCharts[i].id == chartId) {
+                            indexToDelete = i;
+                            break;
+                        }
+                    }
+
+                    existingCharts.splice(indexToDelete, 1);
+                    row.charts = existingCharts;
+                }
+            });
+
+            this.setState({ existingRows: existingRows });
+        }
+    }, {
         key: 'addChart',
         value: function addChart(e, rowId) {
             e.preventDefault();
@@ -23613,7 +23845,7 @@ var SettingsContainer = function (_Component) {
             var rows = this.state.rows;
 
             rows.forEach(function (row) {
-                if (row.id == rowId) {
+                if (row.id == id) {
                     row[field] = value;
                 }
             });
@@ -23680,7 +23912,7 @@ var SettingsContainer = function (_Component) {
                         ),
                         _react2.default.createElement(
                             'a',
-                            { className: 'waves-effect waves-light btn right', onClick: this.save },
+                            { className: 'waves-effect waves-light btn right blue', onClick: this.save },
                             _react2.default.createElement(
                                 'i',
                                 { className: 'material-icons left' },
@@ -23740,7 +23972,10 @@ var SettingsContainer = function (_Component) {
                         title: row.title,
                         charts: row.charts,
                         addChart: _this3.addChart,
-                        handleChartChange: _this3.handleChartChange
+                        handleRowChange: _this3.handleRowChange,
+                        handleChartChange: _this3.handleChartChange,
+                        deleteRow: _this3.deleteRow,
+                        deleteChart: _this3.deleteChart
                     });
                 })
             );
@@ -23753,7 +23988,7 @@ var SettingsContainer = function (_Component) {
 exports.default = SettingsContainer;
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23769,7 +24004,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _SettingsChart = __webpack_require__(80);
+var _SettingsChart = __webpack_require__(82);
 
 var _SettingsChart2 = _interopRequireDefault(_SettingsChart);
 
@@ -23829,15 +24064,15 @@ var SettingsRow = function (_Component) {
                         _react2.default.createElement(
                             'div',
                             { className: 'input-field col s12' },
-                            _react2.default.createElement('input', { id: this.getRowId() + '-title', type: 'text', className: 'validate', onChange: this.handleChange, value: this.props.title }),
+                            _react2.default.createElement('input', { id: this.getRowId() + '-title', name: 'title', type: 'text', onChange: this.handleChange, value: this.props.title }),
                             _react2.default.createElement(
                                 'label',
-                                { htmlFor: 'email' },
+                                { className: 'active', htmlFor: this.getRowId() + '-title' },
                                 'Row Title'
                             ),
                             _react2.default.createElement(
                                 'a',
-                                { className: 'waves-effect waves-light btn', onClick: function onClick(e) {
+                                { className: 'waves-effect waves-light btn', style: { marginRight: '15px' }, onClick: function onClick(e) {
                                         return _this2.props.addChart(e, _this2.props.id);
                                     } },
                                 _react2.default.createElement(
@@ -23846,6 +24081,18 @@ var SettingsRow = function (_Component) {
                                     'add'
                                 ),
                                 'Add Chart'
+                            ),
+                            _react2.default.createElement(
+                                'a',
+                                { className: 'waves-effect waves-light btn red', onClick: function onClick(e) {
+                                        return _this2.props.deleteRow(e, _this2.props.id);
+                                    } },
+                                _react2.default.createElement(
+                                    'i',
+                                    { className: 'material-icons left' },
+                                    'delete_sweep'
+                                ),
+                                'Delete Row'
                             )
                         )
                     )
@@ -23881,7 +24128,8 @@ var SettingsRow = function (_Component) {
                             title: chart.title,
                             prefix: chart.prefix,
                             buckets: chart.buckets,
-                            handleChartChange: _this2.props.handleChartChange
+                            handleChartChange: _this2.props.handleChartChange,
+                            deleteChart: _this2.props.deleteChart
                         });
                     })
                 )
@@ -23895,7 +24143,7 @@ var SettingsRow = function (_Component) {
 exports.default = SettingsRow;
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23932,13 +24180,6 @@ var SettingsChart = function (_Component) {
     }
 
     _createClass(SettingsChart, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            setTimeout(function () {
-                return Materialize.updateTextFields();
-            }, 1);
-        }
-    }, {
         key: 'handleChange',
         value: function handleChange(e) {
             e.preventDefault();
@@ -23948,6 +24189,8 @@ var SettingsChart = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
+            var _this2 = this;
+
             return _react2.default.createElement(
                 'div',
                 { id: this.props.containerId },
@@ -23992,6 +24235,18 @@ var SettingsChart = function (_Component) {
                             'Buckets CSV'
                         )
                     )
+                ),
+                _react2.default.createElement(
+                    'a',
+                    { className: 'waves-effect waves-light btn red', onClick: function onClick(e) {
+                            return _this2.props.deleteChart(e, _this2.props.rowId, _this2.props.id);
+                        } },
+                    _react2.default.createElement(
+                        'i',
+                        { className: 'material-icons left' },
+                        'delete'
+                    ),
+                    'Delete Chart'
                 )
             );
         }

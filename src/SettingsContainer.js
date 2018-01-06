@@ -14,6 +14,8 @@ class SettingsContainer extends Component {
         this.save = this.save.bind(this);
         this.handleRowChange = this.handleRowChange.bind(this);
         this.handleChartChange = this.handleChartChange.bind(this);
+        this.deleteRow = this.deleteRow.bind(this);
+        this.deleteChart = this.deleteChart.bind(this);
     }
 
     componentDidMount() {
@@ -43,6 +45,49 @@ class SettingsContainer extends Component {
         this.setState({rows: existingRows});
     }
 
+    deleteRow(e, id) {
+        e.preventDefault();
+
+        var existingRows = this.state.rows;
+
+        var indexToDelete = -1;
+        for (var i = 0; i < existingRows.length; i++) {
+            if (existingRows[i].id == id) {
+                indexToDelete = i;
+                break;
+            }
+        }
+
+        existingRows.splice(indexToDelete, 1);
+
+        this.setState({existingRows});
+    }
+
+    deleteChart(e, rowId, chartId) {
+        e.preventDefault();
+
+        var existingRows = this.state.rows;
+
+        existingRows.forEach(row => {
+            if (row.id == rowId) {
+                let existingCharts = row.charts;
+                let indexToDelete = -1;
+
+                for (let i = 0; i < existingCharts.length; i++) {
+                    if (existingCharts[i].id == chartId) {
+                        indexToDelete = i;
+                        break;
+                    }
+                }
+
+                existingCharts.splice(indexToDelete, 1);
+                row.charts = existingCharts;
+            }
+        });
+
+        this.setState({existingRows});
+    }
+
     addChart(e, rowId){
         e.preventDefault();
 
@@ -69,7 +114,7 @@ class SettingsContainer extends Component {
         let rows = this.state.rows;
 
         rows.forEach(row => {
-            if (row.id == rowId) {
+            if (row.id == id) {
                 row[field] = value;
             }
         });
@@ -107,7 +152,7 @@ class SettingsContainer extends Component {
                         <h1>Settings</h1>
                         <p className='flow-text'>You can setup your charts here. Add rows with titles, then add one or more Charts to each row. All you need to specify for a Chart is the S3 prefix and buckets to track.</p>
                         <a className="waves-effect waves-light btn" onClick={this.addRow}><i className="material-icons left">add</i>Add Row</a>
-                        <a className="waves-effect waves-light btn right" onClick={this.save}><i className="material-icons left">save</i>Save</a>
+                        <a className="waves-effect waves-light btn right blue" onClick={this.save}><i className="material-icons left">save</i>Save</a>
                         <div className='fixed-action-btn click-to-toggle'>
                             <a className='btn-floating btn-large red'>
                                 <i className='large material-icons'>mode_edit</i>
@@ -126,7 +171,10 @@ class SettingsContainer extends Component {
                         title={row.title}
                         charts={row.charts}
                         addChart={this.addChart}
+                        handleRowChange={this.handleRowChange}
                         handleChartChange={this.handleChartChange}
+                        deleteRow={this.deleteRow}
+                        deleteChart={this.deleteChart}
                     /> 
                 )}
             </div>

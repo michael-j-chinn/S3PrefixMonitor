@@ -7,10 +7,6 @@ class SettingsChart extends Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
-    componentDidMount() {
-        setTimeout(() => Materialize.updateTextFields(), 1);
-    }
-
     handleChange(e) {
         e.preventDefault();
 
@@ -38,6 +34,7 @@ class SettingsChart extends Component {
                         <label htmlFor={this.props.containerId + 'chart-buckets'}>Buckets CSV</label>
                     </div>
                 </div>
+                <a className="waves-effect waves-light btn red" onClick={(e) => this.props.deleteChart(e, this.props.rowId, this.props.id)}><i className="material-icons left">delete</i>Delete Chart</a>
             </div>
         );
     }
