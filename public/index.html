@@ -30,6 +30,13 @@
         <script>
             $(document).ready(function(){
                 $(".button-collapse").sideNav();
+
+                var pollData = function() {
+                    $.post('api/charts/getcounts');
+                };
+
+                pollData();
+                setInterval(pollData, 60000); // 1 min
             });
         </script>
     <!--

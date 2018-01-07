@@ -32,60 +32,60 @@ class SettingsContainer extends Component {
     addRow(e) {
         e.preventDefault();
 
-        var existingRows = this.state.rows;
+        var rows = this.state.rows;
 
         var newRow = {
-            id: existingRows.length + 1,
+            id: rows.length + 1,
             title: '',
             charts: []
         };
 
-        existingRows.push(newRow);
+        rows.push(newRow);
 
-        this.setState({rows: existingRows});
+        this.setState({rows});
     }
 
     deleteRow(e, id) {
         e.preventDefault();
 
-        var existingRows = this.state.rows;
+        var rows = this.state.rows;
 
         var indexToDelete = -1;
-        for (var i = 0; i < existingRows.length; i++) {
-            if (existingRows[i].id == id) {
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i].id == id) {
                 indexToDelete = i;
                 break;
             }
         }
 
-        existingRows.splice(indexToDelete, 1);
+        rows.splice(indexToDelete, 1);
 
-        this.setState({existingRows});
+        this.setState({rows});
     }
 
     deleteChart(e, rowId, chartId) {
         e.preventDefault();
 
-        var existingRows = this.state.rows;
+        var rows = this.state.rows;
 
-        existingRows.forEach(row => {
+        rows.forEach(row => {
             if (row.id == rowId) {
-                let existingCharts = row.charts;
+                let charts = row.charts;
                 let indexToDelete = -1;
 
-                for (let i = 0; i < existingCharts.length; i++) {
-                    if (existingCharts[i].id == chartId) {
+                for (let i = 0; i < charts.length; i++) {
+                    if (charts[i].id == chartId) {
                         indexToDelete = i;
                         break;
                     }
                 }
 
-                existingCharts.splice(indexToDelete, 1);
-                row.charts = existingCharts;
+                charts.splice(indexToDelete, 1);
+                row.charts = charts;
             }
         });
 
-        this.setState({existingRows});
+        this.setState({rows});
     }
 
     addChart(e, rowId){

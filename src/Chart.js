@@ -28,6 +28,8 @@ class Chart extends Component {
             height = (.7 * width),
             columns = chartData.columns,
             data = chartData.rows.map(d => type(d, '', columns));
+        
+        $container.empty();
     
         let svg = d3
             .select('#'+ containerId)
@@ -114,7 +116,7 @@ class Chart extends Component {
     buildChart() {
         this.getChartData(this.props.uuid, 'ALL')
             .then(data => {
-                this.buildChartSvg(data, this.props.uuid);
+                this.buildChartSvg(data, `chart-${this.props.uuid}`);
             })
             .catch(reason => {
                 console.log(reason);
@@ -123,23 +125,26 @@ class Chart extends Component {
 
     componentDidMount() {
         // Set an interval to keep the data fresh
-        //let intervalId = setInterval(() => this.buildChart, 30000);
+        let intervalId = setInterval(() => this.buildChart(), 30000);
 
         // Build the SVG
         this.buildChart();
 
         // Remember the refresh interval so we can clear it
-        //this.setState({intervalId});
+        this.setState({intervalId});
     }
 
     componentWillUnmount() {
+        console.log('chart-componentWillUnmount');
         clearInterval(this.state.intervalId);
     }
 
     render() {
         return (
-            <div id={this.props.uuid} className={"col s12 m" + this.props.colSize}>
+            <div className={"col s12 m" + this.props.colSize}>
                 <h5>{this.props.title}</h5>
+                <div id={'chart-' + this.props.uuid}>
+                </div>
             </div>
         );
     }

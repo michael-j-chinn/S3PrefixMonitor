@@ -1,11 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-//const AWS = require('aws-sdk');
+const AWS = require('aws-sdk');
 const fs = require('fs');
-//const moment = require('moment');
+const moment = require('moment');
 const path = require('path');
 const mkdirp = require('mkdirp');
 const uuidv4 = require('uuid/v4');
+const groupArray = require('group-array');
 
 // Setup express
 let app = express();
@@ -21,23 +22,23 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static('public'));
 
 // Setup AWS
-// AWS.config.loadFromPath('./configs/aws_config.json');
-// var s3 = new AWS.S3();
+AWS.config.loadFromPath('./config/aws_config.json');
+var s3 = new AWS.S3();
 
 // Functions to get data from S3
-// let getBucketCount = function(params) {
-//     return new Promise((resolve, reject) => {
-//         s3.listObjectsV2(params, function(err, data) {
-//             if (err) {
-//                 console.log(err);
-//                 reject(0);
-//             } else if (data && data.KeyCount)
-//                 return resolve(data.KeyCount);
-//             else
-//                 return resolve(0);
-//         });   
-//     });
-// };
+let getBucketCount = function(chart, params) {
+    return new Promise((resolve, reject) => {
+        s3.listObjectsV2(params, function(err, data) {
+            if (err) {
+                console.log(err);
+                reject(err);
+            } else if (data && data.KeyCount)
+                return resolve({ chart, keyCount: data.KeyCount});
+            else
+                return resolve({ chart, keyCount: 0});
+        });   
+    });
+};
 
 // let getFileNames = function(params) {
 //     return new Promise((resolve, reject) => {
@@ -98,35 +99,55 @@ app.get('/api/chart/:chartid/:timerange', (req, res) => {
     let chartid = req.params.chartid;
     let timerange = req.params.timerange;
     let filepath = path.join(__dirname, 'chart_data', `${chartid}.json`);
+    let dataDefault = { columns: [], rows: [] };
 
-    fs.readFile(filepath, 'utf8', (err, data) => {
-        if (err) {
-            console.log(err);
-            res.json('{}');
+    fs.exists(filepath, exists => {
+        if (exists) {
+            fs.readFile(filepath, 'utf8', (err, data) => {
+                if (err) {
+                    console.log(err);
+                    res.json(dataDefault);
+                }
+        
+                let chartData = JSON.parse(data);
+        
+                res.send(chartData);
+            });
+        } else {
+            res.json(dataDefault);
         }
-
-        let chartData = JSON.parse(data);
-
-        res.send(chartData);
     });
 });
 
 app.post('/api/settings', (req, res) => {
     let dir = path.join(__dirname, 'config');
-
     let settings = req.body;
 
-    // Make sure every entity has a unique ID before saving
+    // Make sure every entity has a unique ID and data file.
     settings.rows.forEach(row => {
         if (row.uuid == undefined)
             row.uuid = uuidv4();
 
         row.charts.forEach(chart => {
-            if (chart.uuid == undefined)
+            if (chart.uuid == undefined) {
                 chart.uuid = uuidv4();
+
+                // Create a matching data file for this chart.
+                let buckets = chart.buckets.split(',');
+                let data = { columns: ['date'].concat(buckets), rows:[] };
+                let dir = path.join(__dirname, 'chart_data');
+                let filepath = path.join(dir, `${chart.uuid}.json`);
+
+                mkdirp(dir, err => {
+                    fs.writeFile(filepath, JSON.stringify(data), 'utf8', err => {
+                        if (err) console.log(err);
+                    });
+                });
+            }
         });
     });
 
+    // Save the settings file
     mkdirp(dir, err => {
         fs.writeFile(path.join(dir, 'settings.json'), JSON.stringify(req.body), 'utf8', err => {
             if (err) console.log(err);
@@ -169,59 +190,101 @@ app.get('*', (req, res) => {
 //         });
 // });
 
-// app.get('/data/poll', (req, res) => {
-//     let date = moment().format('YYYYMMDDHHmm');
+app.post('/api/charts/getcounts', (req, res) => {
+    // Make a bucket count request for this timestamp
+    let date = moment().format('YYYYMMDDHHmm');
     
-//     fs.readFile('./configs/jobs.json', 'utf8', (err, data) => {
-//         if (err) console.log(err);
+    // Make the request for all Charts in settings.
+    fs.readFile('./config/settings.json', 'utf8', (readSettingsErr, settingsData) => {
+        if (readSettingsErr) console.log(readSettingsErr);
 
-//         var config = JSON.parse(data);
+        var settings = JSON.parse(settingsData);
 
-//         config.jobs.forEach(job => {
-//             let apiPromises = [];
+        // Create a promise to pull data for each Chart
+        let promises = [];
+        settings.rows.forEach(row => {
+            row.charts.forEach(chart => {
+                // Chart can have multiple buckets
+                let buckets = chart.buckets.split(',');
 
-//             // Get promises for all the api calls so we can synchronize their responses
-//             job.buckets.forEach(bucket => {
-//                 let params = { Bucket: bucket, Prefix: job.prefix };
+                buckets.forEach(bucket => {
+                    promises.push(getBucketCount(chart, { Bucket: bucket, Prefix: chart.prefix }));
+                });
+            });
+        });
+            
+        // Execute the bucket count requests. Responses come back in same order requested.
+        Promise
+            .all(promises)
+            .then(apiResponses => {
+                // Group the results by chart
+                let groupedResponses = groupArray(apiResponses, 'chart.uuid');
 
-//                 apiPromises.push(getBucketCount(params))
-//             });
+                for (var property in groupedResponses) {
+                    if (groupedResponses.hasOwnProperty(property)) {
+                        let group = groupedResponses[property];
+                        let chart = group[0].chart;
+                        let buckets = chart.buckets.split(',');
+                        let row = { date };
 
-//             // Execute the api calls
-//             Promise
-//                 .all(apiPromises)
-//                 .then(apiResponses => {
-//                     // Write the row
-//                     let columns = [date].concat(apiResponses);
-//                     let dir = path.join(__dirname, 'public', 'data');
-//                     let filePath = path.join(dir, job.filename);
-//                     let dataTsv = columns.join('\t') + '\n';
+                        for (let i=0; i < buckets.length; i++) {
+                            row[buckets[i]] = group[i].keyCount;
+                        }
 
-//                     // Make sure the data directory exists
-//                     mkdirp(dir, err => {
-//                         // Make sure the file exists
-//                         fs.exists(filePath, exists => {
-//                             // If the file doesn't exist, write the column headers first.
-//                             if (!exists) {
-//                                 let columnHeaders = ['date'].concat(job.regions);
-//                                 fs.writeFileSync(filePath, columnHeaders.join('\t') + '\n', 'utf8');
-//                             }
+                        let filePath = path.join(__dirname, 'chart_data', `${chart.uuid}.json`);
 
-//                             // Write the date to the file
-//                             fs.appendFile(filePath, dataTsv, 'utf8', err => {
-//                                 if (err) console.log(err);
-                
-//                                 res.end();
-//                             });
-//                         });
-//                     });
-//                 })
-//                 .catch(reason => {
-//                     console.log(reason);
-//                 });;
-//         });
-//     });
-// });
+                        fs.exists(filePath, exists => {
+                            if (exists) {
+                                fs.readFile(filePath, 'utf8', (readChartErr, chartDataRaw) => {
+                                    if (readChartErr) {
+                                        console.log(readChartErr);
+                                        res.end();
+                                    }
+                            
+                                    let chartData = JSON.parse(chartDataRaw);
+                                    chartData.rows.push(row);
+        
+                                    fs.writeFile(filePath, JSON.stringify(chartData), 'utf8', writeChartErr => {
+                                        if (writeChartErr) console.log(writeChartErr);
+                                        res.end();
+                                    });
+                                });
+                            } else {
+                                let buckets = chart.buckets.split(',');
+                                let chartData= { columns: ['date'].concat(buckets), rows: [row] };
+
+                                fs.writeFile(filePath, JSON.stringify(chartData), 'utf8', writeChartErr => {
+                                    if (writeChartErr) console.log(writeChartErr);
+                                    res.end();
+                                });
+                            }
+                        });
+                    }
+                }
+            })
+            .catch(reason => {
+                console.log(reason);
+                res.end();
+            });
+    });
+});
+
+app.delete('/api/all', (req, res) => {
+    fs.readdir(path.join(__dirname, 'chart_data'), 'utf8', (err, files) => {
+        if (err) {
+            console.log(err);
+            res.end();
+        } else {
+            files.forEach(file => {
+                fs.unlink(path.join(__dirname, 'chart_data', file), err => {
+                    if (err) console.log(err);
+                });
+            });
+
+            res.end();
+        }
+    });
+});
 
 // app.get('/data/processed/:bucket', (req, res) => {
 //     var params = { Bucket: req.params.bucket, Prefix: 'click/integration-queue/v1/processed/'};

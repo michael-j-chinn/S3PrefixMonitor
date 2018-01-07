@@ -23516,6 +23516,8 @@ var ChartContainer = function (_Component) {
         };
 
         _this.getChartSettings = _this.getChartSettings.bind(_this);
+        _this.forceRefresh = _this.forceRefresh.bind(_this);
+        _this.clearAllData = _this.clearAllData.bind(_this);
         return _this;
     }
 
@@ -23547,6 +23549,22 @@ var ChartContainer = function (_Component) {
             });
         }
     }, {
+        key: 'forceRefresh',
+        value: function forceRefresh(e) {
+            e.preventDefault();
+
+            axios.post('/api/charts/getcounts').then(function (response) {}).catch(function (reason) {
+                console.log(reason);
+            });
+        }
+    }, {
+        key: 'clearAllData',
+        value: function clearAllData(e) {
+            e.preventDefault();
+
+            axios.delete('/api/all');
+        }
+    }, {
         key: 'render',
         value: function render() {
             return _react2.default.createElement(
@@ -23562,6 +23580,69 @@ var ChartContainer = function (_Component) {
                             'h1',
                             null,
                             'Charts'
+                        ),
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'waves-effect waves-light btn', style: { marginRight: '15px' }, onClick: this.forceRefresh },
+                            _react2.default.createElement(
+                                'i',
+                                { className: 'material-icons left' },
+                                'refresh'
+                            ),
+                            'Force Refresh'
+                        ),
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'waves-effect waves-light btn red', onClick: this.clearAllData },
+                            _react2.default.createElement(
+                                'i',
+                                { className: 'material-icons left' },
+                                'clear_all'
+                            ),
+                            'Clear All Data'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'fixed-action-btn click-to-toggle' },
+                            _react2.default.createElement(
+                                'a',
+                                { className: 'btn-floating btn-large red' },
+                                _react2.default.createElement(
+                                    'i',
+                                    { className: 'large material-icons' },
+                                    'mode_edit'
+                                )
+                            ),
+                            _react2.default.createElement(
+                                'ul',
+                                null,
+                                _react2.default.createElement(
+                                    'li',
+                                    null,
+                                    _react2.default.createElement(
+                                        'a',
+                                        { className: 'btn-floating green', onClick: this.forceRefresh },
+                                        _react2.default.createElement(
+                                            'i',
+                                            { className: 'material-icons' },
+                                            'refresh'
+                                        )
+                                    )
+                                ),
+                                _react2.default.createElement(
+                                    'li',
+                                    null,
+                                    _react2.default.createElement(
+                                        'a',
+                                        { className: 'btn-floating red', onClick: this.clearAllData },
+                                        _react2.default.createElement(
+                                            'i',
+                                            { className: 'material-icons' },
+                                            'clear_all'
+                                        )
+                                    )
+                                )
+                            )
                         ),
                         this.state.settings.rows.map(function (row) {
                             return _react2.default.createElement(_ChartsRow2.default, {
@@ -23726,6 +23807,8 @@ var Chart = function (_Component) {
                 return type(d, '', columns);
             });
 
+            $container.empty();
+
             var svg = d3.select('#' + containerId).append("svg").attr("width", '100%').attr("height", '100%').attr('viewBox', '0 0 ' + (width + margin.left + margin.right) + ' ' + (height + margin.bottom + margin.top));
             //.attr('preserveAspectRatio','xMinYMin');
 
@@ -23805,7 +23888,7 @@ var Chart = function (_Component) {
             var _this2 = this;
 
             this.getChartData(this.props.uuid, 'ALL').then(function (data) {
-                _this2.buildChartSvg(data, _this2.props.uuid);
+                _this2.buildChartSvg(data, 'chart-' + _this2.props.uuid);
             }).catch(function (reason) {
                 console.log(reason);
             });
@@ -23813,18 +23896,23 @@ var Chart = function (_Component) {
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
+            var _this3 = this;
+
             // Set an interval to keep the data fresh
-            //let intervalId = setInterval(() => this.buildChart, 30000);
+            var intervalId = setInterval(function () {
+                return _this3.buildChart();
+            }, 30000);
 
             // Build the SVG
             this.buildChart();
 
             // Remember the refresh interval so we can clear it
-            //this.setState({intervalId});
+            this.setState({ intervalId: intervalId });
         }
     }, {
         key: 'componentWillUnmount',
         value: function componentWillUnmount() {
+            console.log('chart-componentWillUnmount');
             clearInterval(this.state.intervalId);
         }
     }, {
@@ -23832,12 +23920,13 @@ var Chart = function (_Component) {
         value: function render() {
             return _react2.default.createElement(
                 'div',
-                { id: this.props.uuid, className: "col s12 m" + this.props.colSize },
+                { className: "col s12 m" + this.props.colSize },
                 _react2.default.createElement(
                     'h5',
                     null,
                     this.props.title
-                )
+                ),
+                _react2.default.createElement('div', { id: 'chart-' + this.props.uuid })
             );
         }
     }]);
@@ -23917,62 +24006,62 @@ var SettingsContainer = function (_Component) {
         value: function addRow(e) {
             e.preventDefault();
 
-            var existingRows = this.state.rows;
+            var rows = this.state.rows;
 
             var newRow = {
-                id: existingRows.length + 1,
+                id: rows.length + 1,
                 title: '',
                 charts: []
             };
 
-            existingRows.push(newRow);
+            rows.push(newRow);
 
-            this.setState({ rows: existingRows });
+            this.setState({ rows: rows });
         }
     }, {
         key: 'deleteRow',
         value: function deleteRow(e, id) {
             e.preventDefault();
 
-            var existingRows = this.state.rows;
+            var rows = this.state.rows;
 
             var indexToDelete = -1;
-            for (var i = 0; i < existingRows.length; i++) {
-                if (existingRows[i].id == id) {
+            for (var i = 0; i < rows.length; i++) {
+                if (rows[i].id == id) {
                     indexToDelete = i;
                     break;
                 }
             }
 
-            existingRows.splice(indexToDelete, 1);
+            rows.splice(indexToDelete, 1);
 
-            this.setState({ existingRows: existingRows });
+            this.setState({ rows: rows });
         }
     }, {
         key: 'deleteChart',
         value: function deleteChart(e, rowId, chartId) {
             e.preventDefault();
 
-            var existingRows = this.state.rows;
+            var rows = this.state.rows;
 
-            existingRows.forEach(function (row) {
+            rows.forEach(function (row) {
                 if (row.id == rowId) {
-                    var existingCharts = row.charts;
+                    var charts = row.charts;
                     var indexToDelete = -1;
 
-                    for (var i = 0; i < existingCharts.length; i++) {
-                        if (existingCharts[i].id == chartId) {
+                    for (var i = 0; i < charts.length; i++) {
+                        if (charts[i].id == chartId) {
                             indexToDelete = i;
                             break;
                         }
                     }
 
-                    existingCharts.splice(indexToDelete, 1);
-                    row.charts = existingCharts;
+                    charts.splice(indexToDelete, 1);
+                    row.charts = charts;
                 }
             });
 
-            this.setState({ existingRows: existingRows });
+            this.setState({ rows: rows });
         }
     }, {
         key: 'addChart',

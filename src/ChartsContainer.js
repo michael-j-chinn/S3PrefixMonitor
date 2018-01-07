@@ -13,6 +13,8 @@ class ChartContainer extends Component {
         };
 
         this.getChartSettings = this.getChartSettings.bind(this);
+        this.forceRefresh = this.forceRefresh.bind(this);
+        this.clearAllData = this.clearAllData.bind(this);
     }
 
     componentDidMount() {
@@ -34,12 +36,42 @@ class ChartContainer extends Component {
             });
     }
 
+    forceRefresh(e) {
+        e.preventDefault();
+
+        axios
+            .post('/api/charts/getcounts')
+            .then(response => {
+
+            })
+            .catch(reason => {
+                console.log(reason);
+            });
+    }
+
+    clearAllData(e) {
+        e.preventDefault();
+
+        axios.delete('/api/all');
+    }
+
     render() {
         return (
             <div className='container'>
                 <div className='row'>
                     <div className='col s12'>
                         <h1>Charts</h1>
+                        <a className="waves-effect waves-light btn" style={{marginRight: '15px'}} onClick={this.forceRefresh}><i className="material-icons left">refresh</i>Force Refresh</a>
+                        <a className="waves-effect waves-light btn red" onClick={this.clearAllData}><i className="material-icons left">clear_all</i>Clear All Data</a>
+                        <div className='fixed-action-btn click-to-toggle'>
+                            <a className='btn-floating btn-large red'>
+                                <i className='large material-icons'>mode_edit</i>
+                            </a>
+                            <ul>
+                                <li><a className='btn-floating green' onClick={this.forceRefresh}><i className='material-icons'>refresh</i></a></li>
+                                <li><a className='btn-floating red'  onClick={this.clearAllData}><i className='material-icons'>clear_all</i></a></li>
+                            </ul>
+                        </div>
                         {this.state.settings.rows.map(row => 
                             <ChartsRow 
                                 key={row.id}
