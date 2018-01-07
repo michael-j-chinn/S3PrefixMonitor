@@ -5,6 +5,7 @@ const fs = require('fs');
 //const moment = require('moment');
 const path = require('path');
 const mkdirp = require('mkdirp');
+const uuidv4 = require('uuid/v4');
 
 // Setup express
 let app = express();
@@ -93,12 +94,44 @@ app.get('/api/charts', (req, res) => {
     });
 });
 
+app.get('/api/chart/:chartid/:timerange', (req, res) => {
+    let chartid = req.params.chartid;
+    let timerange = req.params.timerange;
+    let filepath = path.join(__dirname, 'chart_data', `${chartid}.json`);
+
+    fs.readFile(filepath, 'utf8', (err, data) => {
+        if (err) {
+            console.log(err);
+            res.json('{}');
+        }
+
+        let chartData = JSON.parse(data);
+
+        res.send(chartData);
+    });
+});
+
 app.post('/api/settings', (req, res) => {
     let dir = path.join(__dirname, 'config');
+
+    let settings = req.body;
+
+    // Make sure every entity has a unique ID before saving
+    settings.rows.forEach(row => {
+        if (row.uuid == undefined)
+            row.uuid = uuidv4();
+
+        row.charts.forEach(chart => {
+            if (chart.uuid == undefined)
+                chart.uuid = uuidv4();
+        });
+    });
 
     mkdirp(dir, err => {
         fs.writeFile(path.join(dir, 'settings.json'), JSON.stringify(req.body), 'utf8', err => {
             if (err) console.log(err);
+
+            res.end();
         });
     });
 });

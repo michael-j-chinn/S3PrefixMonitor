@@ -58,5 +58,5 @@ typings/
 .env
 
 # Data used to feed d3 charts
-data
+chart_data
 config

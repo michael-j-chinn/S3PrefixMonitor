@@ -1,33 +1,58 @@
 import React, { Component } from 'react';
 
-function buildChart(containerId, svgId) {
-    let $container = $('#'+ containerId)
-        width = container.width()
-        height = container.height();
+class Chart extends Component {
+    constructor(props) {
+        super(props);
 
-    let svg = d3.select('#'+ containerId).append("svg")
-        .attr("width", '100%')
-        .attr("height", '100%')
-        .attr('viewBox','0 0 '+Math.min(width,height) +' '+Math.min(width,height) )
-        .attr('preserveAspectRatio','xMinYMin')
-        .append("g")
-        .attr("transform", "translate(" + Math.min(width,height) / 2 + "," + Math.min(width,height) / 2 + ")");
+        this.getChartData = this.getChartData.bind(this);
+        this.buildChartSvg = this.buildChartSvg.bind(this);
+        this.buildChart = this.buildChart.bind(this);
+    }
 
-    var parseTime = d3.timeParse("%Y%m%d%H%M");
+    getChartData(chartUuid, timerange) {
+        return new Promise((resolve, reject) =>{
+            axios.get(`/api/chart/${chartUuid}/${timerange}`)
+                .then(response => {
+                    resolve(response.data);
+                })
+                .catch(reason => {
+                    reject(reason);
+                });
+        });
+    }
 
-    var x = d3.scaleTime().range([0, width]),
-        y = d3.scaleLinear().range([height, 0]),
-        z = d3.scaleOrdinal(d3.schemeCategory10);
+    buildChartSvg(chartData, containerId) {
+        let $container = $('#'+ containerId),
+            margin = {top: 5, right: 15, bottom: 30, left: 22},
+            width = $container.width(),
+            height = (.7 * width),
+            columns = chartData.columns,
+            data = chartData.rows.map(d => type(d, '', columns));
+    
+        let svg = d3
+            .select('#'+ containerId)
+            .append("svg")
+            .attr("width", '100%')
+            .attr("height", '100%')
+            .attr('viewBox',`0 0 ${width+margin.left+margin.right} ${height+margin.bottom+margin.top}`);
+            //.attr('preserveAspectRatio','xMinYMin');
 
-    var line = d3.line()
-        .curve(d3.curveBasis)
-        .x(function(d) { return x(d.date); })
-        .y(function(d) { return y(d.totalFiles); });
-
-    d3.tsv("/data/" + config.tsv + ".tsv", type, function(error, data) {
-        if (error) throw error;
-
-        var regions = data.columns.slice(1).map(function(id) {
+        let g = svg
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+        var parseTime = d3.timeParse("%Y%m%d%H%M");
+    
+        var x = d3.scaleTime().range([0, width]),
+            y = d3.scaleLinear().range([height, 0]),
+            z = d3.scaleOrdinal(d3.schemeCategory10);
+    
+        var line = d3.line()
+            .curve(d3.curveBasis)
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.totalFiles); });
+    
+        var regions = columns.slice(1).map(function(id) {
             return {
                 id: id,
                 values: data.map(function(d) {
@@ -73,31 +98,47 @@ function buildChart(containerId, svgId) {
         region.append("text")
             .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
             .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.totalFiles) + ")"; })
-            .attr("x", 3)
-            .attr("dy", "0.35em")
-            .style("font", "10px sans-serif")
+            .attr("x", -170) // TODO: Figure out how to dynamically calculate this value based on length of the word.
+            .attr("dy", "0.4em")
+            .style("font", "14px sans-serif")
             .text(function(d) { return d.id; });
-    });
-
-    function type(d, _, columns) {
-        d.date = parseTime(d.date);
-        for (var i = 1, n = columns.length, c; i < n; ++i) d[c = columns[i]] = +d[c];
-        return d;
+    
+        function type(d, _, columns) {
+            var parseTime = d3.timeParse("%Y%m%d%H%M");
+            d.date = parseTime(d.date);
+            for (var i = 1, n = columns.length, c; i < n; ++i) d[c = columns[i]] = +d[c];
+            return d;
+        }
     }
-};
 
-class Chart extends Component {
-    constructor(props) {
-        super(props);
+    buildChart() {
+        this.getChartData(this.props.uuid, 'ALL')
+            .then(data => {
+                this.buildChartSvg(data, this.props.uuid);
+            })
+            .catch(reason => {
+                console.log(reason);
+            });
     }
 
     componentDidMount() {
-        
+        // Set an interval to keep the data fresh
+        //let intervalId = setInterval(() => this.buildChart, 30000);
+
+        // Build the SVG
+        this.buildChart();
+
+        // Remember the refresh interval so we can clear it
+        //this.setState({intervalId});
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.state.intervalId);
     }
 
     render() {
         return (
-            <div id={this.props.containerId} className={"col s12 m" + this.props.colSize}>
+            <div id={this.props.uuid} className={"col s12 m" + this.props.colSize}>
                 <h5>{this.props.title}</h5>
             </div>
         );

@@ -23522,10 +23522,12 @@ var ChartContainer = function (_Component) {
     _createClass(ChartContainer, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            getChartSettings();
+            var _this2 = this;
+
+            this.getChartSettings();
 
             var intervalId = setInterval(function () {
-                return getChartSettings();
+                return _this2.getChartSettings();
             }, 15000);
 
             this.setState({ intervalId: intervalId });
@@ -23538,10 +23540,10 @@ var ChartContainer = function (_Component) {
     }, {
         key: 'getChartSettings',
         value: function getChartSettings() {
-            var _this2 = this;
+            var _this3 = this;
 
             axios.get('/api/charts').then(function (response) {
-                _this2.setState({ settings: response.data });
+                _this3.setState({ settings: response.data });
             });
         }
     }, {
@@ -23644,6 +23646,7 @@ var ChartsRow = function (_Component) {
                             return _react2.default.createElement(_Chart2.default, {
                                 key: chart.id,
                                 id: chart.id,
+                                uuid: chart.uuid,
                                 title: chart.title,
                                 colSize: _this2.props.colSize,
                                 width: 800,
@@ -23686,102 +23689,150 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-function buildChart(containerId, svgId) {
-    var $container = $('#' + containerId);
-    width = container.width();
-    height = container.height();
-
-    var svg = d3.select('#' + containerId).append("svg").attr("width", '100%').attr("height", '100%').attr('viewBox', '0 0 ' + Math.min(width, height) + ' ' + Math.min(width, height)).attr('preserveAspectRatio', 'xMinYMin').append("g").attr("transform", "translate(" + Math.min(width, height) / 2 + "," + Math.min(width, height) / 2 + ")");
-
-    var parseTime = d3.timeParse("%Y%m%d%H%M");
-
-    var x = d3.scaleTime().range([0, width]),
-        y = d3.scaleLinear().range([height, 0]),
-        z = d3.scaleOrdinal(d3.schemeCategory10);
-
-    var line = d3.line().curve(d3.curveBasis).x(function (d) {
-        return x(d.date);
-    }).y(function (d) {
-        return y(d.totalFiles);
-    });
-
-    d3.tsv("/data/" + config.tsv + ".tsv", type, function (error, data) {
-        if (error) throw error;
-
-        var regions = data.columns.slice(1).map(function (id) {
-            return {
-                id: id,
-                values: data.map(function (d) {
-                    return { date: d.date, totalFiles: d[id] };
-                })
-            };
-        });
-
-        x.domain(d3.extent(data, function (d) {
-            return d.date;
-        }));
-
-        y.domain([d3.min(regions, function (c) {
-            return d3.min(c.values, function (d) {
-                return 0;
-            });
-        }), d3.max(regions, function (c) {
-            return d3.max(c.values, function (d) {
-                return d.totalFiles;
-            });
-        })]);
-
-        z.domain(regions.map(function (c) {
-            return c.id;
-        }));
-
-        g.append("g").attr("class", "axis axis--x").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
-
-        g.append("g").attr("class", "axis axis--y").call(d3.axisLeft(y)).append("text").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", "0.71em").attr("fill", "#000").text("Total Files");
-
-        var region = g.selectAll(".region").data(regions).enter().append("g").attr("class", "region");
-
-        region.append("path").attr("class", "line").attr("d", function (d) {
-            return line(d.values);
-        }).style("stroke", function (d) {
-            return z(d.id);
-        });
-
-        region.append("text").datum(function (d) {
-            return { id: d.id, value: d.values[d.values.length - 1] };
-        }).attr("transform", function (d) {
-            return "translate(" + x(d.value.date) + "," + y(d.value.totalFiles) + ")";
-        }).attr("x", 3).attr("dy", "0.35em").style("font", "10px sans-serif").text(function (d) {
-            return d.id;
-        });
-    });
-
-    function type(d, _, columns) {
-        d.date = parseTime(d.date);
-        for (var i = 1, n = columns.length, c; i < n; ++i) {
-            d[c = columns[i]] = +d[c];
-        }return d;
-    }
-};
-
 var Chart = function (_Component) {
     _inherits(Chart, _Component);
 
     function Chart(props) {
         _classCallCheck(this, Chart);
 
-        return _possibleConstructorReturn(this, (Chart.__proto__ || Object.getPrototypeOf(Chart)).call(this, props));
+        var _this = _possibleConstructorReturn(this, (Chart.__proto__ || Object.getPrototypeOf(Chart)).call(this, props));
+
+        _this.getChartData = _this.getChartData.bind(_this);
+        _this.buildChartSvg = _this.buildChartSvg.bind(_this);
+        _this.buildChart = _this.buildChart.bind(_this);
+        return _this;
     }
 
     _createClass(Chart, [{
+        key: 'getChartData',
+        value: function getChartData(chartUuid, timerange) {
+            return new Promise(function (resolve, reject) {
+                axios.get('/api/chart/' + chartUuid + '/' + timerange).then(function (response) {
+                    resolve(response.data);
+                }).catch(function (reason) {
+                    reject(reason);
+                });
+            });
+        }
+    }, {
+        key: 'buildChartSvg',
+        value: function buildChartSvg(chartData, containerId) {
+            var $container = $('#' + containerId),
+                margin = { top: 5, right: 15, bottom: 30, left: 22 },
+                width = $container.width(),
+                height = .7 * width,
+                columns = chartData.columns,
+                data = chartData.rows.map(function (d) {
+                return type(d, '', columns);
+            });
+
+            var svg = d3.select('#' + containerId).append("svg").attr("width", '100%').attr("height", '100%').attr('viewBox', '0 0 ' + (width + margin.left + margin.right) + ' ' + (height + margin.bottom + margin.top));
+            //.attr('preserveAspectRatio','xMinYMin');
+
+            var g = svg.append("g").attr("transform", 'translate(' + margin.left + ',' + margin.top + ')');
+
+            var parseTime = d3.timeParse("%Y%m%d%H%M");
+
+            var x = d3.scaleTime().range([0, width]),
+                y = d3.scaleLinear().range([height, 0]),
+                z = d3.scaleOrdinal(d3.schemeCategory10);
+
+            var line = d3.line().curve(d3.curveBasis).x(function (d) {
+                return x(d.date);
+            }).y(function (d) {
+                return y(d.totalFiles);
+            });
+
+            var regions = columns.slice(1).map(function (id) {
+                return {
+                    id: id,
+                    values: data.map(function (d) {
+                        return { date: d.date, totalFiles: d[id] };
+                    })
+                };
+            });
+
+            x.domain(d3.extent(data, function (d) {
+                return d.date;
+            }));
+
+            y.domain([d3.min(regions, function (c) {
+                return d3.min(c.values, function (d) {
+                    return 0;
+                });
+            }), d3.max(regions, function (c) {
+                return d3.max(c.values, function (d) {
+                    return d.totalFiles;
+                });
+            })]);
+
+            z.domain(regions.map(function (c) {
+                return c.id;
+            }));
+
+            g.append("g").attr("class", "axis axis--x").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
+
+            g.append("g").attr("class", "axis axis--y").call(d3.axisLeft(y)).append("text").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", "0.71em").attr("fill", "#000").text("Total Files");
+
+            var region = g.selectAll(".region").data(regions).enter().append("g").attr("class", "region");
+
+            region.append("path").attr("class", "line").attr("d", function (d) {
+                return line(d.values);
+            }).style("stroke", function (d) {
+                return z(d.id);
+            });
+
+            region.append("text").datum(function (d) {
+                return { id: d.id, value: d.values[d.values.length - 1] };
+            }).attr("transform", function (d) {
+                return "translate(" + x(d.value.date) + "," + y(d.value.totalFiles) + ")";
+            }).attr("x", -170) // TODO: Figure out how to dynamically calculate this value based on length of the word.
+            .attr("dy", "0.4em").style("font", "14px sans-serif").text(function (d) {
+                return d.id;
+            });
+
+            function type(d, _, columns) {
+                var parseTime = d3.timeParse("%Y%m%d%H%M");
+                d.date = parseTime(d.date);
+                for (var i = 1, n = columns.length, c; i < n; ++i) {
+                    d[c = columns[i]] = +d[c];
+                }return d;
+            }
+        }
+    }, {
+        key: 'buildChart',
+        value: function buildChart() {
+            var _this2 = this;
+
+            this.getChartData(this.props.uuid, 'ALL').then(function (data) {
+                _this2.buildChartSvg(data, _this2.props.uuid);
+            }).catch(function (reason) {
+                console.log(reason);
+            });
+        }
+    }, {
         key: 'componentDidMount',
-        value: function componentDidMount() {}
+        value: function componentDidMount() {
+            // Set an interval to keep the data fresh
+            //let intervalId = setInterval(() => this.buildChart, 30000);
+
+            // Build the SVG
+            this.buildChart();
+
+            // Remember the refresh interval so we can clear it
+            //this.setState({intervalId});
+        }
+    }, {
+        key: 'componentWillUnmount',
+        value: function componentWillUnmount() {
+            clearInterval(this.state.intervalId);
+        }
     }, {
         key: 'render',
         value: function render() {
             return _react2.default.createElement(
                 'div',
-                { id: this.props.containerId, className: "col s12 m" + this.props.colSize },
+                { id: this.props.uuid, className: "col s12 m" + this.props.colSize },
                 _react2.default.createElement(
                     'h5',
                     null,

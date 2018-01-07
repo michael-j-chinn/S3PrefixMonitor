@@ -16,6 +16,7 @@ class ChartsRow extends Component {
                             <Chart 
                                 key={chart.id}
                                 id={chart.id}
+                                uuid={chart.uuid}
                                 title={chart.title}
                                 colSize={this.props.colSize}
                                 width={800}

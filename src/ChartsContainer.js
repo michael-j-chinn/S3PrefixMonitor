@@ -16,9 +16,9 @@ class ChartContainer extends Component {
     }
 
     componentDidMount() {
-        getChartSettings();
-        
-        let intervalId = setInterval(() => getChartSettings(), 15000);
+        this.getChartSettings();
+
+        let intervalId = setInterval(() => this.getChartSettings(), 15000);
 
         this.setState({intervalId});
     }
