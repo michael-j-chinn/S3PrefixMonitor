@@ -11,7 +11,7 @@ class Chart extends Component {
 
     getChartData(chartUuid, timerange) {
         return new Promise((resolve, reject) =>{
-            axios.get(`/api/chart/${chartUuid}/${timerange}`)
+            axios.get(`/api/v1/charts/${chartUuid}/${timerange}`)
                 .then(response => {
                     resolve(response.data);
                 })

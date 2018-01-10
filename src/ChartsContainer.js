@@ -30,7 +30,7 @@ class ChartContainer extends Component {
     }
 
     getChartSettings() {
-        axios.get('/api/charts')
+        axios.get('/api/v1/charts')
             .then(response => {
                 this.setState({ settings: response.data });
             });
@@ -39,8 +39,7 @@ class ChartContainer extends Component {
     forceRefresh(e) {
         e.preventDefault();
 
-        axios
-            .post('/api/charts/getcounts')
+        axios.post('/api/v1/charts/getcounts')
             .then(response => {
 
             })
@@ -52,7 +51,7 @@ class ChartContainer extends Component {
     clearAllData(e) {
         e.preventDefault();
 
-        axios.delete('/api/all');
+        axios.delete('/api/v1/charts');
     }
 
     render() {

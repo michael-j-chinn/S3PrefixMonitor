@@ -23544,7 +23544,7 @@ var ChartContainer = function (_Component) {
         value: function getChartSettings() {
             var _this3 = this;
 
-            axios.get('/api/charts').then(function (response) {
+            axios.get('/api/v1/charts').then(function (response) {
                 _this3.setState({ settings: response.data });
             });
         }
@@ -23553,7 +23553,7 @@ var ChartContainer = function (_Component) {
         value: function forceRefresh(e) {
             e.preventDefault();
 
-            axios.post('/api/charts/getcounts').then(function (response) {}).catch(function (reason) {
+            axios.post('/api/v1/charts/getcounts').then(function (response) {}).catch(function (reason) {
                 console.log(reason);
             });
         }
@@ -23562,7 +23562,7 @@ var ChartContainer = function (_Component) {
         value: function clearAllData(e) {
             e.preventDefault();
 
-            axios.delete('/api/all');
+            axios.delete('/api/v1/charts');
         }
     }, {
         key: 'render',
@@ -23788,7 +23788,7 @@ var Chart = function (_Component) {
         key: 'getChartData',
         value: function getChartData(chartUuid, timerange) {
             return new Promise(function (resolve, reject) {
-                axios.get('/api/chart/' + chartUuid + '/' + timerange).then(function (response) {
+                axios.get('/api/v1/charts/' + chartUuid + '/' + timerange).then(function (response) {
                     resolve(response.data);
                 }).catch(function (reason) {
                     reject(reason);
@@ -23992,7 +23992,7 @@ var SettingsContainer = function (_Component) {
         value: function componentDidMount() {
             var _this2 = this;
 
-            axios.get('/api/settings').then(function (response) {
+            axios.get('/api/v1/settings').then(function (response) {
                 _this2.setState(response.data);
             });
         }
@@ -24121,7 +24121,7 @@ var SettingsContainer = function (_Component) {
     }, {
         key: 'save',
         value: function save() {
-            axios.post('/api/settings', this.state);
+            axios.post('/api/v1/settings', this.state);
         }
     }, {
         key: 'render',

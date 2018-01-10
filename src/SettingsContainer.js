@@ -19,7 +19,7 @@ class SettingsContainer extends Component {
     }
 
     componentDidMount() {
-        axios.get('/api/settings')
+        axios.get('/api/v1/settings')
             .then(response => {
                 this.setState(response.data);
             });
@@ -141,7 +141,7 @@ class SettingsContainer extends Component {
     }
 
     save() {
-        axios.post('/api/settings', this.state);
+        axios.post('/api/v1/settings', this.state);
     }
 
     render() {
