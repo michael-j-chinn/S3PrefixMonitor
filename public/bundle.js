@@ -23553,7 +23553,9 @@ var ChartContainer = function (_Component) {
         value: function forceRefresh(e) {
             e.preventDefault();
 
-            axios.post('/api/v1/charts/getcounts').then(function (response) {}).catch(function (reason) {
+            axios.post('/api/v1/charts/getcounts').then(function (response) {
+                Materialize.toast('Refresh Requested!', 3000);
+            }).catch(function (reason) {
                 console.log(reason);
             });
         }
@@ -23562,7 +23564,9 @@ var ChartContainer = function (_Component) {
         value: function clearAllData(e) {
             e.preventDefault();
 
-            axios.delete('/api/v1/charts');
+            axios.delete('/api/v1/charts').then(function (response) {
+                Materialize.toast('All data cleared!', 3000);
+            });
         }
     }, {
         key: 'render',
@@ -23762,6 +23766,10 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _ChartTimerange = __webpack_require__(83);
+
+var _ChartTimerange2 = _interopRequireDefault(_ChartTimerange);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23781,6 +23789,9 @@ var Chart = function (_Component) {
         _this.getChartData = _this.getChartData.bind(_this);
         _this.buildChartSvg = _this.buildChartSvg.bind(_this);
         _this.buildChart = _this.buildChart.bind(_this);
+        _this.handleTimerangeClick = _this.handleTimerangeClick.bind(_this);
+
+        _this.state = { timerange: 'LAST_HOUR' };
         return _this;
     }
 
@@ -23887,7 +23898,7 @@ var Chart = function (_Component) {
         value: function buildChart() {
             var _this2 = this;
 
-            this.getChartData(this.props.uuid, 'ALL').then(function (data) {
+            this.getChartData(this.props.uuid, this.state.timerange).then(function (data) {
                 _this2.buildChartSvg(data, 'chart-' + _this2.props.uuid);
             }).catch(function (reason) {
                 console.log(reason);
@@ -23912,20 +23923,41 @@ var Chart = function (_Component) {
     }, {
         key: 'componentWillUnmount',
         value: function componentWillUnmount() {
-            console.log('chart-componentWillUnmount');
             clearInterval(this.state.intervalId);
+        }
+    }, {
+        key: 'handleTimerangeClick',
+        value: function handleTimerangeClick(e, value) {
+            e.preventDefault();
+
+            var timerange = this.state.timerange;
+            timerange = value;
+            this.setState({ timerange: timerange });
+        }
+    }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate() {
+            this.buildChart();
         }
     }, {
         key: 'render',
         value: function render() {
+            var timerangeOptions = [{ value: 'LAST_HOUR', text: 'Hour' }, { value: 'LAST_DAY', text: 'Day' }, { value: 'LAST_WEEK', text: 'Week' }];
+
             return _react2.default.createElement(
                 'div',
-                { className: "col s12 m" + this.props.colSize },
+                { className: 'col s12 m' + this.props.colSize },
                 _react2.default.createElement(
                     'h5',
                     null,
                     this.props.title
                 ),
+                _react2.default.createElement(_ChartTimerange2.default, {
+                    uuid: this.props.uuid,
+                    timerangeOptions: timerangeOptions,
+                    active: this.state.timerange,
+                    handleClick: this.handleTimerangeClick
+                }),
                 _react2.default.createElement('div', { id: 'chart-' + this.props.uuid })
             );
         }
@@ -24007,10 +24039,11 @@ var SettingsContainer = function (_Component) {
             e.preventDefault();
 
             var rows = this.state.rows;
+            var id = rows.length + 1;
 
             var newRow = {
-                id: rows.length + 1,
-                title: '',
+                id: id,
+                title: 'Row - #' + id,
                 charts: []
             };
 
@@ -24121,7 +24154,9 @@ var SettingsContainer = function (_Component) {
     }, {
         key: 'save',
         value: function save() {
-            axios.post('/api/v1/settings', this.state);
+            axios.post('/api/v1/settings', this.state).then(function (response) {
+                Materialize.toast('Settings Saved!', 3000);
+            });
         }
     }, {
         key: 'render',
@@ -24447,10 +24482,10 @@ var SettingsChart = function (_Component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'input-field col s12' },
-                        _react2.default.createElement('input', { id: this.props.containerId + 'chart-title', name: 'title', type: 'text', className: 'validate', onChange: this.handleChange, value: this.props.title }),
+                        _react2.default.createElement('input', { id: this.props.containerId + 'chart-title', name: 'title', type: 'text', onChange: this.handleChange, value: this.props.title }),
                         _react2.default.createElement(
                             'label',
-                            { htmlFor: this.props.containerId + 'chart-title' },
+                            { className: 'active', htmlFor: this.props.containerId + 'chart-title' },
                             'Chart Title'
                         )
                     )
@@ -24461,10 +24496,10 @@ var SettingsChart = function (_Component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'input-field col s12' },
-                        _react2.default.createElement('input', { id: this.props.containerId + 'chart-prefix', name: 'prefix', type: 'text', className: 'validate', onChange: this.handleChange, value: this.props.prefix }),
+                        _react2.default.createElement('input', { id: this.props.containerId + 'chart-prefix', name: 'prefix', type: 'text', placeholder: 'example: images/pending-resize', onChange: this.handleChange, value: this.props.prefix }),
                         _react2.default.createElement(
                             'label',
-                            { htmlFor: this.props.containerId + 'chart-prefix' },
+                            { className: 'active', htmlFor: this.props.containerId + 'chart-prefix' },
                             'Prefix to Monitor'
                         )
                     )
@@ -24475,10 +24510,10 @@ var SettingsChart = function (_Component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'input-field col s12' },
-                        _react2.default.createElement('input', { id: this.props.containerId + 'chart-buckets', name: 'buckets', type: 'text', className: 'validate', onChange: this.handleChange, value: this.props.buckets }),
+                        _react2.default.createElement('input', { id: this.props.containerId + 'chart-buckets', name: 'buckets', type: 'text', className: 'validate', placeholder: 'example: my-image-bucket-us1,my-image-bucket-us2', onChange: this.handleChange, value: this.props.buckets }),
                         _react2.default.createElement(
                             'label',
-                            { htmlFor: this.props.containerId + 'chart-buckets' },
+                            { className: 'active', htmlFor: this.props.containerId + 'chart-buckets' },
                             'Buckets CSV'
                         )
                     )
@@ -24503,6 +24538,74 @@ var SettingsChart = function (_Component) {
 }(_react.Component);
 
 exports.default = SettingsChart;
+
+/***/ }),
+/* 83 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ChartTimerange = function (_Component) {
+    _inherits(ChartTimerange, _Component);
+
+    function ChartTimerange(props) {
+        _classCallCheck(this, ChartTimerange);
+
+        return _possibleConstructorReturn(this, (ChartTimerange.__proto__ || Object.getPrototypeOf(ChartTimerange)).call(this, props));
+    }
+
+    _createClass(ChartTimerange, [{
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            return _react2.default.createElement(
+                'div',
+                { id: 'chart-pagination-' + this.props.uuid },
+                _react2.default.createElement(
+                    'ul',
+                    { className: 'pagination' },
+                    this.props.timerangeOptions.map(function (option, index) {
+                        return _react2.default.createElement(
+                            'li',
+                            { key: index, className: _this2.props.active == option.value ? 'active' : '' },
+                            _react2.default.createElement(
+                                'a',
+                                { href: '#', onClick: function onClick(e) {
+                                        return _this2.props.handleClick(e, option.value);
+                                    }, 'data-value': option.value },
+                                option.text
+                            )
+                        );
+                    })
+                )
+            );
+        }
+    }]);
+
+    return ChartTimerange;
+}(_react.Component);
+
+exports.default = ChartTimerange;
 
 /***/ })
 /******/ ]);

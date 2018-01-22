@@ -39,7 +39,7 @@ class ChartContainer extends Component {
 
         axios.post('/api/v1/charts/getcounts')
             .then(response => {
-
+                Materialize.toast('Refresh Requested!', 3000);
             })
             .catch(reason => {
                 console.log(reason);
@@ -49,7 +49,11 @@ class ChartContainer extends Component {
     clearAllData(e) {
         e.preventDefault();
 
-        axios.delete('/api/v1/charts');
+        axios
+            .delete('/api/v1/charts')
+            .then(response => {
+                Materialize.toast('All data cleared!', 3000);
+            });
     }
 
     render() {

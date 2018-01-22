@@ -33,10 +33,11 @@ class SettingsContainer extends Component {
         e.preventDefault();
 
         var rows = this.state.rows;
+        let id = rows.length + 1;
 
         var newRow = {
-            id: rows.length + 1,
-            title: '',
+            id,
+            title: 'Row - #' + id,
             charts: []
         };
 
@@ -141,7 +142,11 @@ class SettingsContainer extends Component {
     }
 
     save() {
-        axios.post('/api/v1/settings', this.state);
+        axios
+            .post('/api/v1/settings', this.state)
+            .then(response => {
+                Materialize.toast('Settings Saved!', 3000);
+            });
     }
 
     render() {

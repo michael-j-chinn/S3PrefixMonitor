@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ChartTimerange from './ChartTimerange';
 
 class Chart extends Component {
     constructor(props) {
@@ -7,6 +8,9 @@ class Chart extends Component {
         this.getChartData = this.getChartData.bind(this);
         this.buildChartSvg = this.buildChartSvg.bind(this);
         this.buildChart = this.buildChart.bind(this);
+        this.handleTimerangeClick = this.handleTimerangeClick.bind(this);
+
+        this.state = { timerange: 'LAST_HOUR'};
     }
 
     getChartData(chartUuid, timerange) {
@@ -114,7 +118,7 @@ class Chart extends Component {
     }
 
     buildChart() {
-        this.getChartData(this.props.uuid, 'ALL')
+        this.getChartData(this.props.uuid, this.state.timerange)
             .then(data => {
                 this.buildChartSvg(data, `chart-${this.props.uuid}`);
             })
@@ -135,14 +139,37 @@ class Chart extends Component {
     }
 
     componentWillUnmount() {
-        console.log('chart-componentWillUnmount');
         clearInterval(this.state.intervalId);
     }
 
+    handleTimerangeClick(e, value) {
+        e.preventDefault();
+
+        let timerange = this.state.timerange;
+        timerange = value;
+        this.setState({timerange});
+    }
+
+    componentDidUpdate() {
+        this.buildChart();
+    }
+
     render() {
+        let timerangeOptions = [
+            {value:'LAST_HOUR', text:'Hour'},
+            {value:'LAST_DAY', text:'Day'},
+            {value:'LAST_WEEK', text:'Week'}
+        ];
+
         return (
-            <div className={"col s12 m" + this.props.colSize}>
+            <div className={'col s12 m' + this.props.colSize}>
                 <h5>{this.props.title}</h5>
+                <ChartTimerange
+                    uuid={this.props.uuid}
+                    timerangeOptions={timerangeOptions}
+                    active={this.state.timerange}
+                    handleClick={this.handleTimerangeClick}
+                 />
                 <div id={'chart-' + this.props.uuid}>
                 </div>
             </div>
