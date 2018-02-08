@@ -19710,7 +19710,11 @@ var _ChartsContainer = __webpack_require__(77);
 
 var _ChartsContainer2 = _interopRequireDefault(_ChartsContainer);
 
-var _SettingsContainer = __webpack_require__(80);
+var _RawDataContainer = __webpack_require__(81);
+
+var _RawDataContainer2 = _interopRequireDefault(_RawDataContainer);
+
+var _SettingsContainer = __webpack_require__(82);
 
 var _SettingsContainer2 = _interopRequireDefault(_SettingsContainer);
 
@@ -19729,6 +19733,7 @@ var Container = function Container(props) {
                 null,
                 _react2.default.createElement(_reactRouterDom.Route, { path: '/', exact: true, component: _ChartsContainer2.default }),
                 _react2.default.createElement(_reactRouterDom.Route, { path: '/charts', component: _ChartsContainer2.default }),
+                _react2.default.createElement(_reactRouterDom.Route, { path: '/rawdata', component: _RawDataContainer2.default }),
                 _react2.default.createElement(_reactRouterDom.Route, { path: '/settings', component: _SettingsContainer2.default })
             )
         )
@@ -23440,6 +23445,15 @@ var Navbar = function Navbar(props) {
                     null,
                     _react2.default.createElement(
                         _reactRouterDom.Link,
+                        { to: '/rawdata' },
+                        'Raw Data'
+                    )
+                ),
+                _react2.default.createElement(
+                    'li',
+                    null,
+                    _react2.default.createElement(
+                        _reactRouterDom.Link,
                         { to: '/settings' },
                         'Settings'
                     )
@@ -23455,6 +23469,15 @@ var Navbar = function Navbar(props) {
                         _reactRouterDom.Link,
                         { to: '/charts' },
                         'Charts'
+                    )
+                ),
+                _react2.default.createElement(
+                    'li',
+                    null,
+                    _react2.default.createElement(
+                        _reactRouterDom.Link,
+                        { to: '/rawdata' },
+                        'Raw Data'
                     )
                 ),
                 _react2.default.createElement(
@@ -23766,7 +23789,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _ChartTimerange = __webpack_require__(83);
+var _ChartTimerange = __webpack_require__(80);
 
 var _ChartTimerange2 = _interopRequireDefault(_ChartTimerange);
 
@@ -23985,7 +24008,216 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _SettingsRow = __webpack_require__(81);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ChartTimerange = function (_Component) {
+    _inherits(ChartTimerange, _Component);
+
+    function ChartTimerange(props) {
+        _classCallCheck(this, ChartTimerange);
+
+        return _possibleConstructorReturn(this, (ChartTimerange.__proto__ || Object.getPrototypeOf(ChartTimerange)).call(this, props));
+    }
+
+    _createClass(ChartTimerange, [{
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            return _react2.default.createElement(
+                'div',
+                { id: 'chart-pagination-' + this.props.uuid },
+                _react2.default.createElement(
+                    'ul',
+                    { className: 'pagination' },
+                    this.props.timerangeOptions.map(function (option, index) {
+                        return _react2.default.createElement(
+                            'li',
+                            { key: index, className: _this2.props.active == option.value ? 'active' : '' },
+                            _react2.default.createElement(
+                                'a',
+                                { href: '#', onClick: function onClick(e) {
+                                        return _this2.props.handleClick(e, option.value);
+                                    }, 'data-value': option.value },
+                                option.text
+                            )
+                        );
+                    })
+                )
+            );
+        }
+    }]);
+
+    return ChartTimerange;
+}(_react.Component);
+
+exports.default = ChartTimerange;
+
+/***/ }),
+/* 81 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RawDataContainer = function (_Component) {
+    _inherits(RawDataContainer, _Component);
+
+    function RawDataContainer(props) {
+        _classCallCheck(this, RawDataContainer);
+
+        var _this = _possibleConstructorReturn(this, (RawDataContainer.__proto__ || Object.getPrototypeOf(RawDataContainer)).call(this, props));
+
+        _this.state = { data: [] };
+
+        _this.forceRefresh = _this.forceRefresh.bind(_this);
+        _this.getUniqueFileNamePortion = _this.getUniqueFileNamePortion.bind(_this);
+        return _this;
+    }
+
+    _createClass(RawDataContainer, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this2 = this;
+
+            axios.get('/api/v1/rawdata').then(function (response) {
+                _this2.setState({ data: response.data });
+            }).catch(function (reason) {
+                console.log(reason);
+                Materialize.toast('Issue while loading inital data: ' + reason, 3000);
+            });
+        }
+    }, {
+        key: 'getUniqueFileNamePortion',
+        value: function getUniqueFileNamePortion(rawData, file) {
+            var bucketPrefix = 'https://s3.console.aws.amazon.com/s3/object/' + rawData.bucket + '/' + rawData.prefix;
+            return file.substring(bucketPrefix.length);
+        }
+    }, {
+        key: 'forceRefresh',
+        value: function forceRefresh(e) {
+            var _this3 = this;
+
+            e.preventDefault();
+
+            axios.get('/api/v1/rawdata').then(function (response) {
+                _this3.setState({ data: response.data });
+                Materialize.toast('Refreshed!', 3000);
+            }).catch(function (reason) {
+                console.log(reason);
+                Materialize.toast('Issue while refreshing: ' + reason, 3000);
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this4 = this;
+
+            return _react2.default.createElement(
+                'div',
+                { className: 'container' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'row' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'col s12' },
+                        _react2.default.createElement(
+                            'h1',
+                            null,
+                            'Raw Data'
+                        ),
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'waves-effect waves-light btn', onClick: this.forceRefresh },
+                            _react2.default.createElement(
+                                'i',
+                                { className: 'material-icons left' },
+                                'refresh'
+                            ),
+                            'Refresh'
+                        ),
+                        this.state.data.map(function (rawData, index) {
+                            return _react2.default.createElement(
+                                'ul',
+                                { key: index, className: 'collection with-header' },
+                                _react2.default.createElement(
+                                    'li',
+                                    { className: 'collection-header orange lighten-5' },
+                                    rawData.bucket + '/' + rawData.prefix
+                                ),
+                                rawData.files.length > 0 ? rawData.files.map(function (file, fileIndex) {
+                                    return _react2.default.createElement(
+                                        'li',
+                                        { key: fileIndex, className: 'collection-item' },
+                                        _react2.default.createElement(
+                                            'a',
+                                            { href: file, target: '_blank' },
+                                            _this4.getUniqueFileNamePortion(rawData, file)
+                                        )
+                                    );
+                                }) : _react2.default.createElement(
+                                    'li',
+                                    { className: 'collection-item' },
+                                    'No data found'
+                                )
+                            );
+                        })
+                    )
+                )
+            );
+        }
+    }]);
+
+    return RawDataContainer;
+}(_react.Component);
+
+;
+
+exports.default = RawDataContainer;
+
+/***/ }),
+/* 82 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _SettingsRow = __webpack_require__(83);
 
 var _SettingsRow2 = _interopRequireDefault(_SettingsRow);
 
@@ -24270,7 +24502,7 @@ var SettingsContainer = function (_Component) {
 exports.default = SettingsContainer;
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24286,7 +24518,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _SettingsChart = __webpack_require__(82);
+var _SettingsChart = __webpack_require__(84);
 
 var _SettingsChart2 = _interopRequireDefault(_SettingsChart);
 
@@ -24425,7 +24657,7 @@ var SettingsRow = function (_Component) {
 exports.default = SettingsRow;
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24538,74 +24770,6 @@ var SettingsChart = function (_Component) {
 }(_react.Component);
 
 exports.default = SettingsChart;
-
-/***/ }),
-/* 83 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ChartTimerange = function (_Component) {
-    _inherits(ChartTimerange, _Component);
-
-    function ChartTimerange(props) {
-        _classCallCheck(this, ChartTimerange);
-
-        return _possibleConstructorReturn(this, (ChartTimerange.__proto__ || Object.getPrototypeOf(ChartTimerange)).call(this, props));
-    }
-
-    _createClass(ChartTimerange, [{
-        key: 'render',
-        value: function render() {
-            var _this2 = this;
-
-            return _react2.default.createElement(
-                'div',
-                { id: 'chart-pagination-' + this.props.uuid },
-                _react2.default.createElement(
-                    'ul',
-                    { className: 'pagination' },
-                    this.props.timerangeOptions.map(function (option, index) {
-                        return _react2.default.createElement(
-                            'li',
-                            { key: index, className: _this2.props.active == option.value ? 'active' : '' },
-                            _react2.default.createElement(
-                                'a',
-                                { href: '#', onClick: function onClick(e) {
-                                        return _this2.props.handleClick(e, option.value);
-                                    }, 'data-value': option.value },
-                                option.text
-                            )
-                        );
-                    })
-                )
-            );
-        }
-    }]);
-
-    return ChartTimerange;
-}(_react.Component);
-
-exports.default = ChartTimerange;
 
 /***/ })
 /******/ ]);

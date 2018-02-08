@@ -9,10 +9,12 @@ const Navbar = (props) => {
                 <a href="#" data-activates="mobile-menu" className="button-collapse"><i className="material-icons">menu</i></a>
                 <ul id="nav-mobile" className="right hide-on-med-and-down">
                     <li><Link to="/charts">Charts</Link></li>
+                    <li><Link to="/rawdata">Raw Data</Link></li>
                     <li><Link to="/settings">Settings</Link></li>
                 </ul>
                 <ul className="side-nav" id="mobile-menu">
                     <li><Link to="/charts">Charts</Link></li>
+                    <li><Link to="/rawdata">Raw Data</Link></li>
                     <li><Link to="/settings">Settings</Link></li>
                 </ul>
             </div>
