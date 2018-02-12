@@ -24161,6 +24161,36 @@ var RawDataContainer = function (_Component) {
                             ),
                             'Refresh'
                         ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'fixed-action-btn click-to-toggle' },
+                            _react2.default.createElement(
+                                'a',
+                                { className: 'btn-floating btn-large red' },
+                                _react2.default.createElement(
+                                    'i',
+                                    { className: 'large material-icons' },
+                                    'mode_edit'
+                                )
+                            ),
+                            _react2.default.createElement(
+                                'ul',
+                                null,
+                                _react2.default.createElement(
+                                    'li',
+                                    null,
+                                    _react2.default.createElement(
+                                        'a',
+                                        { className: 'btn-floating green', onClick: this.forceRefresh },
+                                        _react2.default.createElement(
+                                            'i',
+                                            { className: 'material-icons' },
+                                            'refresh'
+                                        )
+                                    )
+                                )
+                            )
+                        ),
                         this.state.data.map(function (rawData, index) {
                             return _react2.default.createElement(
                                 'ul',

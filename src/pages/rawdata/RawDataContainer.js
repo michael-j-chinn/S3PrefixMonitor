@@ -47,6 +47,14 @@ class RawDataContainer extends Component {
                     <div className='col s12'>
                         <h1>Raw Data</h1>
                         <a className="waves-effect waves-light btn" onClick={this.forceRefresh}><i className="material-icons left">refresh</i>Refresh</a>
+                        <div className='fixed-action-btn click-to-toggle'>
+                            <a className='btn-floating btn-large red'>
+                                <i className='large material-icons'>mode_edit</i>
+                            </a>
+                            <ul>
+                                <li><a className='btn-floating green' onClick={this.forceRefresh}><i className='material-icons'>refresh</i></a></li>
+                            </ul>
+                        </div>
                         {this.state.data.map((rawData, index) => 
                             <ul key={index} className='collection with-header'>
                                 <li className='collection-header orange lighten-5'>{`${rawData.bucket}/${rawData.prefix}`}</li>
