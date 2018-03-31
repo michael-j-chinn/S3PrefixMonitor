@@ -32,11 +32,11 @@ let getFileNames = function(params) {
 };
 
 rawdata.get('/', (req, res) => {
-    let filepath = path.join(__basedir, 'config', 'settings.json');
+    let settingsFilePath = path.join(__basedir, 'config', 'settings.json');
 
-    fs.exists(filepath, exists => {
+    fs.exists(settingsFilePath, exists => {
         if (exists) {
-            fs.readFile(filepath, 'utf8', (err, data) => {
+            fs.readFile(settingsFilePath, 'utf8', (err, data) => {
                 if (err) {
                     res.json(defaultRawData);
                 } else {
