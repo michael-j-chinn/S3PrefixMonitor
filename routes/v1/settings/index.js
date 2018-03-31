@@ -5,9 +5,9 @@ const fs = require('fs');
 const uuidv4 = require('uuid/v4');
 
 settings.get('/', (req, res) => {
-    let filepath = path.join(__basedir, 'config', 'settings.json');
+    let settingsFilePath = path.join(__basedir, 'config', 'settings.json');
 
-    fs.readFile(filepath, 'utf8', (err, data) => {
+    fs.readFile(settingsFilePath, 'utf8', (err, data) => {
         if (err)
             res.json('{}');
         else
