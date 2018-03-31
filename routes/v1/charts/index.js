@@ -85,7 +85,6 @@ charts.get('/:chartid/:timerange', (req, res) => {
 charts.delete('/', (req, res) => {
     fs.readdir(path.join(__basedir, 'chart_data'), 'utf8', (err, files) => {
         if (err) {
-            console.log(err);
             res.end();
         } else {
             files.forEach(file => {
