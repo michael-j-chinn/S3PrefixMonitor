@@ -3,28 +3,10 @@ const path = require('path');
 const fs = require('fs');
 const moment = require('moment');
 const groupArray = require('group-array');
-const AWS = require('aws-sdk');
+const s3 = require('../../../services/S3Service');
 
 const defaultSettings = { rows:[] };
 const defaultChartData = { columns: [], rows: [] };
-
-// Setup AWS
-AWS.config.loadFromPath('./config/aws_config.json');
-var s3 = new AWS.S3();
-
-let getBucketCount = function(chart, params) {
-    return new Promise((resolve, reject) => {
-        s3.listObjectsV2(params, function(err, data) {
-            if (err) {
-                console.log(err);
-                reject(err);
-            } else if (data && data.KeyCount)
-                return resolve({ chart, keyCount: data.KeyCount});
-            else
-                return resolve({ chart, keyCount: 0});
-        });   
-    });
-};
 
 let filterChartDataRowsByTimerange = function(chartDataRows, timerange) {
     return chartDataRows.filter(row => {
@@ -103,7 +85,6 @@ charts.get('/:chartid/:timerange', (req, res) => {
 charts.delete('/', (req, res) => {
     fs.readdir(path.join(__basedir, 'chart_data'), 'utf8', (err, files) => {
         if (err) {
-            console.log(err);
             res.end();
         } else {
             files.forEach(file => {
@@ -139,7 +120,7 @@ charts.post('/getcounts', (req, res) => {
                         let buckets = chart.buckets.split(',');
 
                         buckets.forEach(bucket => {
-                            promises.push(getBucketCount(chart, { Bucket: bucket, Prefix: chart.prefix }));
+                            promises.push(s3.getBucketCount(chart, bucket, chart.prefix));
                         });
                     });
                 });

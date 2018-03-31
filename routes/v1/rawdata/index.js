@@ -1,46 +1,20 @@
 const rawdata = require('express').Router();
 const path = require('path');
 const fs = require('fs');
-const AWS = require('aws-sdk');
+const s3 = require('../../../services/S3Service');
 
-const defaultRawData = { data:[] };
-
-// Setup AWS
-AWS.config.loadFromPath('./config/aws_config.json');
-var s3 = new AWS.S3();
-
-let getFileNames = function(params) {
-    return new Promise((resolve, reject) => {
-        s3.listObjectsV2(params, function(err, data) {
-            let response = {
-                bucket: params.Bucket,
-                prefix: params.Prefix,
-                files: []
-            };
-
-            if (err) {
-                console.log(err);
-                resolve(response);
-            } else if (data && data.Contents && data.Contents.length > 0) {
-                response.files = data.Contents.map(file => `https://s3.console.aws.amazon.com/s3/object/${data.Name}/${file.Key}`);
-                return resolve(response);
-            }
-            else
-                return resolve(response);
-        });   
-    });
-};
+const defaultRawData = [];
 
 rawdata.get('/', (req, res) => {
-    let filepath = path.join(__basedir, 'config', 'settings.json');
+    let settingsFilePath = path.join(__basedir, 'config', 'settings.json');
 
-    fs.exists(filepath, exists => {
+    fs.exists(settingsFilePath, exists => {
         if (exists) {
-            fs.readFile(filepath, 'utf8', (err, data) => {
+            fs.readFile(settingsFilePath, 'utf8', (err, data) => {
                 if (err) {
                     res.json(defaultRawData);
                 } else {
-                    var settings = JSON.parse(data);
+                    let settings = JSON.parse(data);
 
                     let promises = [];
                     settings.rows.forEach(row => {
@@ -49,7 +23,7 @@ rawdata.get('/', (req, res) => {
                             let buckets = chart.buckets.split(',');
 
                             buckets.forEach(bucket => {
-                                promises.push(getFileNames({ Bucket: bucket, Prefix: chart.prefix }));
+                                promises.push(s3.getFileNames(bucket, chart.prefix));
                             });
                         });
                     });
