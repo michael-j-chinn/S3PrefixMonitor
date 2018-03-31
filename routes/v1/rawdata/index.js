@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const AWS = require('aws-sdk');
 
-const defaultRawData = { data:[] };
+const defaultRawData = [];
 
 // Setup AWS
 AWS.config.loadFromPath('./config/aws_config.json');
