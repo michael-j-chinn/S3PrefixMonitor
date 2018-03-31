@@ -7,7 +7,7 @@ const defaultRawData = { data:[] };
 
 // Setup AWS
 AWS.config.loadFromPath('./config/aws_config.json');
-var s3 = new AWS.S3();
+let s3 = new AWS.S3();
 
 let getFileNames = function(params) {
     return new Promise((resolve, reject) => {
@@ -40,7 +40,7 @@ rawdata.get('/', (req, res) => {
                 if (err) {
                     res.json(defaultRawData);
                 } else {
-                    var settings = JSON.parse(data);
+                    let settings = JSON.parse(data);
 
                     let promises = [];
                     settings.rows.forEach(row => {
