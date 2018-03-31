@@ -4,12 +4,14 @@ const mkdirp = require('mkdirp');
 const fs = require('fs');
 const uuidv4 = require('uuid/v4');
 
+let defaultSettings = { rows:[] };
+
 settings.get('/', (req, res) => {
     let settingsFilePath = path.join(__basedir, 'config', 'settings.json');
 
     fs.readFile(settingsFilePath, 'utf8', (err, data) => {
         if (err)
-            res.json('{}');
+            res.json(defaultSettings);
         else
             res.json(JSON.parse(data));
     });

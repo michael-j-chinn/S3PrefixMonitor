@@ -22,6 +22,10 @@ class SettingsContainer extends Component {
         axios.get('/api/v1/settings')
             .then(response => {
                 this.setState(response.data);
+            })
+            .catch(reason => {
+                console.log(reason);
+                Materialize.toast(`Issue while loading inital data: ${reason}`, 3000);
             });
     }
 
